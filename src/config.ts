@@ -1,13 +1,13 @@
-export const LOGGING = true;
+export const LOGGING = false;
 export const SPEED_FRACTION_NORMAL = 8;
 export const SPEED_FRACTION_FAST = 4;
 export const FAST_SPEED_LIMIT_MB = 10;
 
 export const MIN_SIZE_IN_MB = 0.1;
 
-// export const MAX_SIZE_IN_MB = 10;
+export const MAX_SIZE_IN_MB = 299;
 // export const MAX_SIZE_IN_MB = 299; // MAX SIZE JSON
-export const MAX_SIZE_IN_MB = 800; // MAX SIZE JSON
+
 
 
 export const START_ITERATION = 0;

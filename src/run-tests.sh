@@ -1,20 +1,20 @@
 #!/bin/bash
 
-npm run benchmark 'testJson'
+npm start 'testJson'
 
-npm run benchmark 'testBson'
+npm start 'testBson'
 
-npm run benchmark 'testAvro'
+npm start 'testAvro'
 
-npm run benchmark 'testProtoJs'
-npm run benchmark 'testProtoGoogle'
-npm run benchmark 'testProtoProtons'
-npm run benchmark 'testProtoMixed'
+npm start 'testProtoJs'
+npm start 'testProtoGoogle'
+npm start 'testProtoProtons'
+npm start 'testProtoMixed'
 
-npm run benchmark 'testJsBin'
-npm run benchmark 'testJsBinOptional'
+npm start 'testJsBin'
+npm start 'testJsBinOptional'
 
-npm run benchmark 'testJsonUnmapped'
-npm run benchmark 'testJsBinUnmapped'
-npm run benchmark 'testJsBinJsonUnmapped'
-npm run benchmark 'testBsonUnmapped'
+npm start 'testJsonUnmapped'
+npm start 'testJsBinUnmapped'
+npm start 'testJsBinJsonUnmapped'
+npm start 'testBsonUnmapped'

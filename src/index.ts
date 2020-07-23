@@ -25,7 +25,8 @@ const TESTS = {
 
 
 (async () => {
-  const args = process.argv.slice(2);
+  const args = process.argv.slice(3);
+  console.log('Arguments', args);
   if (args.length) {
     for (const arg of args) {
       if (TESTS[arg]) {

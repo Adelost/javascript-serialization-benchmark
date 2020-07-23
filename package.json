@@ -11,9 +11,8 @@
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "benchmark": "ts-node src/index.ts --expose-gc",
     "clean": "rimraf dist dist-minified coverage tmp",
-    "start": "node dist/index.js --expose-gc",
+    "start": "ts-node src/index.ts --expose-gc",
     "start-ts": "ts-node src/index.ts --expose-gc",
     "start-min": "node minified/index.js --expose-gc",
     "build": "tsc",
