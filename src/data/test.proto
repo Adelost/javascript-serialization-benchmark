@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message Item {
+  int32 x  = 1;
+  double y  = 2;
+  double z  = 3;
+}
+
+message Items {
+  repeated Item items = 1;
+}
+

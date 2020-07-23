@@ -1,0 +1,5 @@
+*
+!dist/**
+*.example.*
+*.spec.*
+*.js.map
