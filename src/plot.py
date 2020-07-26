@@ -1,84 +1,107 @@
 import matplotlib.pyplot as plt
 import json as json
 
-FILE = 'tmp/plot.json'
+INPUT_FILE = 'tmp/plot.json'
+OUTPUT_DIR = '../img'
+OUTPUT_NAME = 'tmp.svg'
+
+PRINT_SIZE_RATIO = False
+SAVE_IMAGE = True
+ONLY_RATIO = False
 
 X_LABEL = 'JSON size (MB)'
 X_MIN_VALUE = 0.5
 X_MAX_VALUE = 2000
-
-ALLOWED_LABELS = {
-    # "JSON",
-    # "BSON",
-    # "AVRO",
-    # "PROTOBUF (mixed)",
-    # "PROTOBUF (JS)",
-    # "JSBIN",
-
-    # "JSON",
-    # "JSON (unmapped)",
-    # "JSBIN (unmapped)",
-    #
-    # "JSBIN",
-    # "JSBIN (optional)",
-    # "JSBIN JSON (unmapped)",
-
-    # "JSON",
-    # "JSON (unmapped)",
-    # "BSON",
-    # "BSON (unmapped)",
-
-    # "JSON",
-    # "PROTOBUF (mixed)",
-    # "PROTOBUF (JS)",
-    # "PROTOBUF (Protons)",
-    # "PROTOBUF (Google)",
-}
-SKIPPED_LABELS = {
-    # "JSON",
-    # "BSON",
-    # "AVRO",
-    # "PROTOBUF (mixed)",
-    # "PROTOBUF (JS)",
-    # "JSBIN",
-
-    # "JSON",
-    # "JSON (unmapped)",
-    # "JSBIN (unmapped)",
-    #
-    # "JSBIN",
-    # "JSBIN (optional)",
-    # "JSBIN JSON (unmapped)",
-
-    # "JSON",
-    # "JSON (unmapped)",
-    # "BSON",
-    # "BSON (unmapped)",
-
-    # "JSON",
-    # "PROTOBUF (mixed)",
-    # "PROTOBUF (JS)",
-    # "PROTOBUF (Protons)",
-    # "PROTOBUF (Google)",
-}
+ALLOWED_LABELS = []
 
 
 def main():
-    # plt.figure(figsize=(8, 9))
-    # plt.figure(figsize=(12, 14))
-    plt.figure(figsize=(10, 8.5))
-    ax = plot_x(None, 'encodedTime', 1, 'Encode time (s)', True)
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.5), ncol=3, fancybox=True)
-    plot_x('JSON', 'encodedTime', 2, 'Encode time (ratio)', False)
-    plot_x(None, 'decodedTime', 3, 'Decode time (s)', True)
-    plot_x('JSON', 'decodedTime', 4, 'Decode time (ratio)', False)
-    # plot_x(None, 'encodedSize', 4, 'Encoded size', False)
+    global OUTPUT_NAME
+    global ALLOWED_LABELS
+    global ONLY_RATIO
+    global PRINT_SIZE_RATIO
+    global X_MIN_VALUE
 
-# plt.savefig('../img/tmp.svg')
-    plt.show()
+    # # Hack to print size ratios at 10 MB (ignore displayed image)
+    # X_MIN_VALUE = 10
+    # PRINT_SIZE_RATIO = True
+    # plot()
+    # PRINT_SIZE_RATIO = False
+    # X_MIN_VALUE = 0.5
+
+    # Main test
+    OUTPUT_NAME='bench-full.svg'
+    ALLOWED_LABELS = [
+        "JSON",
+        "BSON",
+        "AVRO",
+        "JSBIN",
+        "PROTOBUF (JS)",
+        "PROTOBUF (mixed)",
+    ]
+    plot()
+
+    # Protocol buffers
+    OUTPUT_NAME='bench-protobuf.svg'
+    ALLOWED_LABELS = [
+        "JSON",
+        "PROTOBUF (mixed)",
+        "PROTOBUF (JS)",
+        "PROTOBUF (Protons)",
+        "PROTOBUF (Google)",
+    ]
+    plot()
+
+    # Unmapped data
+    OUTPUT_NAME='bench-unmapped.svg'
+    ONLY_RATIO = True
+    ALLOWED_LABELS = [
+        "JSON",
+        "JSON (unmapped)",
+        "JSBIN",
+        "JSBIN (unmapped)",
+        "BSON",
+        "BSON (unmapped)",
+    ]
+    plot()
+
+    OUTPUT_NAME='bench-jsbin.svg'
+    ALLOWED_LABELS = [
+        "JSON",
+        "JSBIN",
+        "JSBIN (optional)",
+        "JSBIN JSON (unmapped)",
+    ]
+    plot()
 
 
-with open(FILE) as json_file:
+def plot():
+    if PRINT_SIZE_RATIO:
+        global X_MIN_VALUE
+        X_MIN_VALUE = 10
+        ax = plot_x('JSON', 'encodedSize', 1, 'Encoded size', True)
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.38), ncol=3, fancybox=True)
+    else:
+        if ONLY_RATIO:
+            plt.figure(figsize=(10, 4.15))
+            ax = plot_x('JSON', 'encodedTime', 1, 'Encode time (ratio)', False)
+            ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.38), ncol=3, fancybox=True)
+            plot_x('JSON', 'decodedTime', 2, 'Decode time (ratio)', False)
+        else:
+            plt.figure(figsize=(10, 8.5))
+            ax = plot_x(None, 'encodedTime', 1, 'Encode time (s)', True)
+            ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.5), ncol=3, fancybox=True)
+            plot_x('JSON', 'encodedTime', 2, 'Encode time (ratio)', False)
+            plot_x(None, 'decodedTime', 3, 'Decode time (s)', True)
+            plot_x('JSON', 'decodedTime', 4, 'Decode time (ratio)', False)
+
+    if SAVE_IMAGE:
+        plt.savefig(f'{OUTPUT_DIR}/{OUTPUT_NAME}')
+    else:
+        plt.show()
+
+
+with open(INPUT_FILE) as json_file:
     TEST_DATA = json.load(json_file)
 
 
@@ -86,45 +109,39 @@ def plot_x(baselineKey, yKey, id, yLabel, log):
     baseline = None
     if baselineKey:
         baseline = TEST_DATA[baselineKey]
-    plt.subplot(4, 1, id)
-    for key in TEST_DATA:
+    if ONLY_RATIO:
+        plt.subplot(2, 1, id)
+    else:
+        plt.subplot(4, 1, id)
+    if ALLOWED_LABELS:
+        keys = ALLOWED_LABELS
+    else:
+        keys = TEST_DATA
+
+    for key in keys:
         item = TEST_DATA[key]
         x_values = item['x']
         x_start, x_stop = find_x_range(x_values)
         y_values = item['y'][yKey]
         label = item['label']
-        if ALLOWED_LABELS and label not in ALLOWED_LABELS:
-            continue
-        if label in SKIPPED_LABELS:
-            continue
         x_values = x_values[x_start:x_stop]
         y_values = y_values[x_start:x_stop]
-        print(f'{label}, {yKey}, start x:{x_values[0]}, y:{y_values[0]}')
         if baseline:
             baseline_y_values = baseline['y'][yKey][x_start:x_stop]
             y_values_ratios = calc_ratios(y_values, baseline_y_values)
             y_values = y_values_ratios
         # y_values = pad_y_values(x_values, y_values)
+        print(f'{label}, {yKey}, start x:{round(x_values[0], 2)}, y:{round(y_values[0], 2)}')
         plt.plot(x_values, y_values, label=label)
 
     ax = plt.gca()
-    # ax.set(xlim=(1))
     ax.set_xscale('log')
     if log:
         ax.set_yscale('log')
-
     plt.xlabel(X_LABEL)
     plt.ylabel(yLabel or yKey)
-
     plt.grid()
-    # plt.legend(loc='lower right')
-    # plt.legend(loc='upper left')
-    # ax.legend(bbox_to_anchor=(1.1, 0), loc='lower right')
-    # ax.legend(bbox_to_anchor=(0.5, 1), loc='center')
-
     return ax
-    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.4),
-    #           fancybox=True, shadow=True, ncol=5)
 
 
 def pad_y_values(x_values, y_values):
@@ -158,5 +175,20 @@ def find_x_range(xs):
             break
     return x_start, x_stop
 
+
 if __name__ == '__main__':
     main()
+
+# JSON, encodedSize, start x:10.47, y:1.0
+# BSON, encodedSize, start x:10.47, y:0.79
+# AVRO, encodedSize, start x:10.47, y:0.32
+# PROTOBUF (JS), encodedSize, start x:10.47, y:0.42
+# PROTOBUF (Google), encodedSize, start x:10.47, y:0.42
+# PROTOBUF (Protons), encodedSize, start x:10.47, y:0.42
+# PROTOBUF (mixed), encodedSize, start x:10.47, y:0.42
+# JSBIN, encodedSize, start x:10.47, y:0.32
+# JSBIN (optional), encodedSize, start x:10.47, y:0.38
+# JSON (unmapped), encodedSize, start x:10.47, y:0.77
+# JSBIN (unmapped), encodedSize, start x:10.47, y:0.48
+# JSBIN JSON (unmapped), encodedSize, start x:10.47, y:0.77
+# BSON (unmapped), encodedSize, start x:10.47, y:0.79
