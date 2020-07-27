@@ -189,7 +189,7 @@ During decoding, `protobufjs`, `Protobuf (mixed)` performed the fastest at about
 ### Payload results
 
 | | JSON |JS|Google|Protons|Pbf|mixed|
-|-|-|-|-|-|-|-
+|---|---|---|---|---|---|---
 |Size ratio|1.00|0.41|0.41|0.41|0.41|0.41|
 |Payload limit|298 MB|153 MB|98 MB|40 MB|372 MB|372 MB
 
@@ -203,7 +203,7 @@ All implementations stayed consistent to the protobuf format and resulted in an 
 ### Data pollution during decoding
 
 | |JSON|JS|Google|Protons|Pbf|mixed
-|-|-|-|-|-|-|-
+|---|---|---|---|---|---|---
 |Prototype pollution      | |x| |x| |x
 |Getters/Setters| | | |x| | | 
 |Requires unwrapping| | |x| | 
@@ -303,7 +303,7 @@ During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all pe
 ### Payload results
 
 | |JSON|BSON|Protobuf (JS)|Protobuf (mixed)|AVRO|JSBIN
-|-|-|-|-|-|-|-
+|---|---|---|---|---|---|---
 |Size ratio|1.00|0.79|0.42|0.42|0.32|0.32
 |Payload limit|298 MB|21 MB| 153 MB| 372 MB|372 MB| 372 MB
 
@@ -316,7 +316,7 @@ During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all pe
 ### Data pollution during decoding
 
 | |BSON|JSBIN|AVRO|Protobuf (JS)|Protobuf (mixed)
-|-|-|-|-|-|-
+|---|---|---|---|---|---
 |Prototype pollution | | |x|x|x|
 
 > This table shows an overview of negative effects during decoding.
@@ -411,7 +411,7 @@ As neither formats supports tuples, the tuple will be encoded as a 64-bit float 
 > Performance graph of `JSON` with different settings.
 
 | |JSON|JSON (unmapped)
-|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|---|---|---
 |Size ratio|1.00|0.77
 
 Switching to unmapped data improved both encoding (1/4 faster) and decoding (1/3 faster). It also reduced size ratio to 0.77 of the original JSON.
@@ -423,7 +423,7 @@ Switching to unmapped data improved both encoding (1/4 faster) and decoding (1/3
 > Performance graph of `avsc` with different settings.
 
 | |AVRO Ascv|AVRO Ascv (optional)|AVRO Ascv (unmapped)|
-|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|---|---|---|---
 |Size ratio|0.32|0.38|0.49
 |Payload limit|372 MB|372 MB|237 MB
 
@@ -439,7 +439,7 @@ Switching to `unmapped` data also worsened performance similarly. One plausable 
 > Performance graph of `js-binary` with different settings.
 
 | |JSBIN|JSBIN (optional)|JSBIN (unmapped)|JSBIN JSON (unmapped)
-|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|---|---|---|---|---
 |Size ratio|0.32|0.38|0.48|0.77
 
 Switching to `unmapped` had a slight improvement on encoding speed, but apart from this `optional` and `unmapped` had almost no impact on performance.
@@ -455,7 +455,7 @@ Encoding all data using the `js-binary` datatype `json` performed almost identic
 > Performance graph of `bson` with different settings.
 
 | |BSON|BSON (unmapped)
-|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|---|---|---
 |Size ratio|0.79|0.79|0.48|0.77
 
 Unmapped BSON is still slower than JSON in most cases, but it did receive a performance improvement, especially during decoding.
