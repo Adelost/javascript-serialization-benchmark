@@ -3,21 +3,26 @@ import { runTest } from './utils/helper';
 
 
 const TESTS = {
-  testJson: () => runTest('JSON', ({ mappedData }) => bench.testJson(mappedData), 298),
+  testJson: () => runTest('JSON', ({ data }) => bench.testJson(data), 298),
 
-  testBson: () => runTest('BSON', ({ mappedData }) => bench.testBson(mappedData), 21),
+  testBson: () => runTest('BSON', ({ data }) => bench.testBson(data), 21),
 
-  testAvro: () => runTest('AVRO', ({ mappedData }) => bench.testAvro(mappedData), 372),
+  testAvroJs: () => runTest('AVRO JS', ({ data }) => bench.testAvroJs(data), 372),
+  testAvroAvsc: () => runTest('AVRO Avsc', ({ data }) => bench.testAvroAvsc(data), 372),
+  testAvroAvscOptional: () => runTest('AVRO Avsc (optional)', ({ data }) => bench.testAvroAvscOptional(data), 372),
 
-  testProtoJs: () => runTest('PROTOBUF (JS)', ({ mappedData }) => bench.testProtoJs(mappedData), 153),
-  testProtoGoogle: () => runTest('PROTOBUF (Google)', ({ mappedData }) => bench.testProtoGoogle(mappedData), 98),
-  testProtoProtons: () => runTest('PROTOBUF (Protons)', ({ mappedData }) => bench.testProtoProtons(mappedData), 40),
-  testProtoMixed: () => runTest('PROTOBUF (mixed)', ({ mappedData }) => bench.testProtoMixed(mappedData), 372),
 
-  testJsBin: () => runTest('JSBIN', ({ mappedData }) => bench.testJsBin(mappedData), 372),
-  testJsBinOptional: () => runTest('JSBIN (optional)', ({ mappedData }) => bench.testJsBinOptional(mappedData), 372),
+  testProtoJs: () => runTest('PROTOBUF JS', ({ data }) => bench.testProtoJs(data), 153),
+  testProtoPbf: () => runTest('PROTOBUF Pbf', ({ data }) => bench.testProtoPbf(data), 372),
+  testProtoGoogle: () => runTest('PROTOBUF Google', ({ data }) => bench.testProtoGoogle(data), 98),
+  testProtoProtons: () => runTest('PROTOBUF Protons', ({ data }) => bench.testProtoProtons(data), 40),
+  testProtoMixed: () => runTest('PROTOBUF mixed', ({ data }) => bench.testProtoMixed(data), 372),
+
+  testJsBin: () => runTest('JSBIN', ({ data }) => bench.testJsBin(data), 372),
+  testJsBinOptional: () => runTest('JSBIN (optional)', ({ data }) => bench.testJsBinOptional(data), 372),
 
   testJsonUnmapped: () => runTest('JSON (unmapped)', ({ unmappedData }) => bench.testJsonUnmapped(unmappedData), 298),
+  testAvroAvscUnmapped: () => runTest('AVRO Avsc (unmapped)', ({ unmappedData }) => bench.testAvroAvscUnmapped(unmappedData), 237),
   testJsBinUnmapped: () => runTest('JSBIN (unmapped)', ({ unmappedData }) => bench.testJsBinUnmapped(unmappedData), 372),
   testJsBinJsonUnmapped: () => runTest('JSBIN JSON (unmapped)', ({ unmappedData }) => bench.testJsBinJsonUnmapped(unmappedData), 372),
   testBsonUnmapped: () => runTest('BSON (unmapped)', ({ unmappedData }) => bench.testBsonUnmapped(unmappedData), 21),
@@ -44,9 +49,12 @@ async function runDefault() {
 
   await TESTS.testBson();
 
-  await TESTS.testAvro();
+  await TESTS.testAvroJs();
+  await TESTS.testAvroAvsc();
+  await TESTS.testAvroAvscOptional();
 
   await TESTS.testProtoJs();
+  await TESTS.testProtoPbf();
   await TESTS.testProtoGoogle();
   await TESTS.testProtoProtons();
   await TESTS.testProtoMixed();
@@ -55,6 +63,7 @@ async function runDefault() {
   await TESTS.testJsBinOptional();
 
   await TESTS.testJsonUnmapped();
+  await TESTS.testAvroAvscUnmapped();
   await TESTS.testJsBinUnmapped();
   await TESTS.testJsBinJsonUnmapped();
   await TESTS.testBsonUnmapped();

@@ -7,7 +7,7 @@ export const MIN_SIZE_IN_MB = 0.1;
 
 export const MAX_SIZE_IN_MB = 299;
 // export const MAX_SIZE_IN_MB = 299; // MAX SIZE JSON
-
+// export const MAX_SIZE_IN_MB = 372; // MAX SIZE TEST DATA
 
 
 export const START_ITERATION = 0;

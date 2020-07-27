@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 import json as json
 
@@ -23,74 +25,102 @@ def main():
     global X_MIN_VALUE
 
     # # Hack to print size ratios at 10 MB (ignore displayed image)
-    # X_MIN_VALUE = 10
-    # PRINT_SIZE_RATIO = True
-    # plot()
-    # PRINT_SIZE_RATIO = False
-    # X_MIN_VALUE = 0.5
+    X_MIN_VALUE = 10
+    PRINT_SIZE_RATIO = True
+    plot()
+    PRINT_SIZE_RATIO = False
+    X_MIN_VALUE = 0.5
 
     # Main test
     OUTPUT_NAME='bench-full.svg'
     ALLOWED_LABELS = [
         "JSON",
         "BSON",
-        "AVRO",
+        "AVRO Avsc",
         "JSBIN",
-        "PROTOBUF (JS)",
-        "PROTOBUF (mixed)",
+        "PROTOBUF JS",
+        "PROTOBUF Pbf",
+        "PROTOBUF mixed",
+
     ]
     plot()
-
+    #
     # Protocol buffers
     OUTPUT_NAME='bench-protobuf.svg'
     ALLOWED_LABELS = [
         "JSON",
-        "PROTOBUF (mixed)",
-        "PROTOBUF (JS)",
-        "PROTOBUF (Protons)",
-        "PROTOBUF (Google)",
+        "PROTOBUF JS",
+        "PROTOBUF Pbf",
+        "PROTOBUF Protons",
+        "PROTOBUF Google",
+        "PROTOBUF mixed",
     ]
     plot()
 
-    # Unmapped data
+    # Result extra
     OUTPUT_NAME='bench-unmapped.svg'
     ONLY_RATIO = True
+
+    # JSON extra
+    OUTPUT_NAME='bench-json-extra.svg'
     ALLOWED_LABELS = [
         "JSON",
         "JSON (unmapped)",
-        "JSBIN",
-        "JSBIN (unmapped)",
+    ]
+    plot()
+
+    # Avro extra
+    OUTPUT_NAME='bench-avro-extra.svg'
+    ALLOWED_LABELS = [
+        "JSON",
+        "JSON (unmapped)",
+        "AVRO Avsc",
+        "AVRO Avsc (optional)",
+        "AVRO Avsc (unmapped)",
+    ]
+    plot()
+
+    # BSON extra
+    OUTPUT_NAME='bench-bson-extra.svg'
+    ALLOWED_LABELS = [
+        "JSON",
+        "JSON (unmapped)",
         "BSON",
         "BSON (unmapped)",
     ]
     plot()
 
-    OUTPUT_NAME='bench-jsbin.svg'
+    # JSBIN extra
+    OUTPUT_NAME='bench-jsbin-extra.svg'
     ALLOWED_LABELS = [
         "JSON",
+        "JSON (unmapped)",
         "JSBIN",
         "JSBIN (optional)",
+        "JSBIN (unmapped)",
         "JSBIN JSON (unmapped)",
     ]
     plot()
 
-
 def plot():
+    columns = 3
+    if ALLOWED_LABELS:
+        columns = math.ceil(len(ALLOWED_LABELS) / 2)
     if PRINT_SIZE_RATIO:
         global X_MIN_VALUE
         X_MIN_VALUE = 10
         ax = plot_x('JSON', 'encodedSize', 1, 'Encoded size', True)
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.38), ncol=3, fancybox=True)
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.38), ncol=columns, fancybox=True)
     else:
         if ONLY_RATIO:
             plt.figure(figsize=(10, 4.15))
             ax = plot_x('JSON', 'encodedTime', 1, 'Encode time (ratio)', False)
-            ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.38), ncol=3, fancybox=True)
+            ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.38), ncol=columns, fancybox=True)
             plot_x('JSON', 'decodedTime', 2, 'Decode time (ratio)', False)
         else:
             plt.figure(figsize=(10, 8.5))
             ax = plot_x(None, 'encodedTime', 1, 'Encode time (s)', True)
-            ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.5), ncol=3, fancybox=True)
+            ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.5), ncol=columns, fancybox=True)
             plot_x('JSON', 'encodedTime', 2, 'Encode time (ratio)', False)
             plot_x(None, 'decodedTime', 3, 'Decode time (s)', True)
             plot_x('JSON', 'decodedTime', 4, 'Decode time (ratio)', False)
@@ -182,10 +212,10 @@ if __name__ == '__main__':
 # JSON, encodedSize, start x:10.47, y:1.0
 # BSON, encodedSize, start x:10.47, y:0.79
 # AVRO, encodedSize, start x:10.47, y:0.32
-# PROTOBUF (JS), encodedSize, start x:10.47, y:0.42
-# PROTOBUF (Google), encodedSize, start x:10.47, y:0.42
-# PROTOBUF (Protons), encodedSize, start x:10.47, y:0.42
-# PROTOBUF (mixed), encodedSize, start x:10.47, y:0.42
+# PROTOBUF JS, encodedSize, start x:10.47, y:0.42
+# PROTOBUF Google, encodedSize, start x:10.47, y:0.42
+# PROTOBUF Protons, encodedSize, start x:10.47, y:0.42
+# PROTOBUF mixed, encodedSize, start x:10.47, y:0.42
 # JSBIN, encodedSize, start x:10.47, y:0.32
 # JSBIN (optional), encodedSize, start x:10.47, y:0.38
 # JSON (unmapped), encodedSize, start x:10.47, y:0.77

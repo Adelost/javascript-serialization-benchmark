@@ -24,7 +24,7 @@ export async function runTest(label: string, fn: (payload) => Promise<BenchmarkR
     [3, 5.171833333333334, 0.4337666666666671],
     [4, 6.473133333333333, 0.36703333333333354],
   ];
-  let mappedData: any = null;
+  let data: any = null;
   let sizeInMb = 0;
   let i = 0;
   while (true) {
@@ -38,8 +38,8 @@ export async function runTest(label: string, fn: (payload) => Promise<BenchmarkR
     // Ugly performance optimization to avoid calculating object size
     // on large payloads (which can be slow)
     if (sizeInMb < FAST_SPEED_LIMIT_MB * 1.5) {
-      mappedData = mapTestData(unmappedData);
-      sizeInMb = bytesToMb(JSON.stringify(mappedData).length);
+      data = mapTestData(unmappedData);
+      sizeInMb = bytesToMb(JSON.stringify(data).length);
     } else {
       sizeInMb += sizeInMb / fractionIncrement;
     }
@@ -53,11 +53,11 @@ export async function runTest(label: string, fn: (payload) => Promise<BenchmarkR
       break;
     }
     if (sizeInMb >= FAST_SPEED_LIMIT_MB * 1.5) {
-      mappedData = mapTestData(unmappedData);
+      data = mapTestData(unmappedData);
     }
     if (sizeInMb >= MIN_SIZE_IN_MB) {
       log(`\n${i} DATA SIZE: ${sizeInMb}`);
-      results.push(await fn({ unmappedData, mappedData }));
+      results.push(await fn({ unmappedData, mappedData: data }));
       xValues.push(sizeInMb);
     } else {
       log(`# ${i} DATA SIZE: ${sizeInMb}`);
@@ -115,14 +115,12 @@ export async function benchmark(args: BenchmarkArgs): Promise<BenchmarkResult> {
     decodedTime,
     encodedSize,
   };
-  if (out.encodedTime + out.decodedTime > 0.5) {
-    log(
-      out.encodedTime.toFixed(2),
-      out.decodedTime.toFixed(2),
-      out.encodedSize.toFixed(2),
-      sample,
-    );
-  }
+  log(
+    out.encodedTime.toFixed(2),
+    out.decodedTime.toFixed(2),
+    out.encodedSize.toFixed(2),
+    sample,
+  );
   return out;
 }
 
