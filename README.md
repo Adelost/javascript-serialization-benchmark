@@ -8,24 +8,25 @@ By sharing my findings I hope it can be of help (and save time) to someone in a 
 
 ## Abstract
 
-6 different JavaScript serialization libraries and versions are compared:
+7 different JavaScript serialization libraries and versions are compared:
 
  * `protobufjs` "6.10.1"
  * `bson` "4.0.4"
+ * `pbf` "3.2.1"
  * `google-protobuf` "4.0.0-rc.1"
+ * `avsc` "5.4.21"
  * `protons` "1.2.1"
- * `avro-js` "1.10.0"
  * `js-binary` "1.2.0"
 
-During encoding `avro-js` perfomed the fastest at 10 times faster than native JSON at most payload sizes, followed by `js-binary` and `protons` at 2 times faster. `protobufjs` and `bson` perfomed the slowest at about 3 times slower than native JSON.
+During encoding, `avsc` perfomed the fastest at 10 times faster than native JSON at most payload sizes, followed by `js-binary`, `protons` at 2 times faster. `protobufjs` and `bson` perfomed the slowest at about 3 times slower than native JSON.
 
-During decoding, `avro-js`, `protobufjs`, `js-binary` all performed equally well at about 5 times faster than native JSON at most payload sizes. `protons` performed the slowest at 20-30 times slower, followed by `bson` at 1.5 times slower
+During decoding, `avsc`, `protobufjs`, `js-binary` all performed similarly well at about 5 times faster than native JSON at most payload sizes, though `avsc` seems to have a slight advantage. `protons` performed the slowest at 20-30 times slower, followed by `bson` at 1.5 times slower
 
-`avro-js`, `js-binary` gave the best compression ratio of the encoded data at 0.32 compared to JSON, followed by `protobufjs`, `google-protobuf` and `protons` with a ratio of 0.42.
+`avsc` and `js-binary` gave the best compression ratio of the encoded data at 0.32 compared to JSON, followed by `protobufjs`, `pbf`, `google-protobuf`, `protons` with a ratio of 0.42.
 
-`avro-js`, `js-binary` was able to handle the largest file sizes at both encoding and decoding, with an estimate of 372 MB (measured as JSON) given the default Node.js-heap size. In general the maximum file size coincided with the measured encoding/decoding-speed of each implementation.
+`avsc` and `js-binary` was able to handle the largest file sizes at both encoding and decoding, with an estimate of 372 MB (measured as JSON) given the default Node.js-heap size. In general the maximum file size coincided with the measured encoding/decoding-speed of each implementation.
 
-`bson`, `js-binary` all convert cleanly back to JavaScript without any detected renmnats from the encoding process. `avro-js`, `js-binary` contained minor remnants. `google-protobuf`, `protons` had additional remnants or ramifications.
+`js-binary`, `pbf`, `bson` all convert cleanly back to JavaScript without any detected renmnats from the encoding process. `avro-js` and `js-binary` contained minor remnants. `google-protobuf` and `protons` had major remnants or ramifications.
 
 ## Introduction
 
@@ -83,16 +84,18 @@ The following libraries and versions are tested (sorted by weekly downloads):
 
  * `protobufjs` "6.10.1" - 3,449k downloads
  * `bson` "4.0.4" - 1,826k downloads
+ * `pbf` "3.2.1" - 431k downloads
  * `google-protobuf` "4.0.0-rc.1" - 348k downloads
+ * `avsc` "5.4.21" - 43k downloads
  * `protons` "1.2.1" - 30k downloads
- * `avro-js` "1.10.0" - 1.2k downloads
+ * ~~`avro-js` "1.10.0" - 1.2k downloads~~
  * `js-binary` "1.2.0" - 0.3k downloads
 
 They are categorized as:
 
-* Protocol Buffer ( `protobufjs` , `google-protobuf` , `protons` ): `google-protobuf` is Googles official release, but `protobufjs` is by far the most popular, possible due to it being easier to use. To further compare against `protobufjs` a third library called `protons` is included.  
+* Protocol Buffer ( `protobufjs` , `pbf`, `google-protobuf` , `protons` ): `google-protobuf` is Googles official release, but `protobufjs` is by far the most popular, possible due to it being easier to use. To further compare against `protobufjs` a third library called `protons` is included.  
 * BSON ( `bson` ): BSON stands for Binary JSON and is popularized by its use in MongoDB. 
-* Avro ( `avro-js` ): Although relatively unused `avro-js` is the official JavaScript release by Apache Foundation.
+* Avro ( `avsc`, `avro-js` ): `avsc` seems to be the most popular Avro library. `avro-js` appears to be an offical release by the Apache Foundation but this was excluded from the result section as it seems to be based on a older version on `avsc`, and both libraries yelded very similar benchmark results with a slight advantage to `avsc`.
 * JS-Binary ( `js-binary` ): The most obscure (judging by weekly downloads). Still `js-binary` seemed like a good contender due to it being easy to use (having a very compact and flexible schema-format) and being optimized for JavaScript. The main drawback being that it will be difficult to use in other programming languages should the need arise.
 
 ## Benchmark
@@ -101,11 +104,13 @@ Each format will be compared against JavaScripts built in JSON library as a base
 
 The data used in the benchmark is a growing array of tuples that is grown in increments of 1/8 below 10 MB, at each iteration and to speed things up 1/4 above 10 MB. In a real scenario it could be though of as a list of vectors in a 2D or 3D space, such as a 3D-model or similarly data intensive object. 
 
-To further complicate things the first element of the tuple is an integer. This will give a slight edge to some serialization-formats as an integer can be represented more compact in binary rather than floating-point number. To all formats that support it the integer is encoded as a 32-bit signed integer and decimal numbers are encoded as 64-bit floating-point numbers.
+To further complicate things the first element of the tuple is an integer. This will give a slight edge to some serialization-formats as an integer can be represented more compact in binary rather than floating-point number. 
+
+To all formats that support multiple datatype sizes; integers are encoded as a 32-bit signed integer and decimal numbers are encoded as 64-bit floating-point numbers.
 
 The data is as follows:
 
-```
+```typescript
 [
   [1, 4.0040000000000004, 1.0009999999999994], 
   [2, 4.371033333333333, 0.36703333333333266], 
@@ -117,13 +122,13 @@ The data is as follows:
 
 The first challenge that arose is that not all serialization formats supports root level arrays, and almost no one seems to support tuples, and as such the arrays first need to be mapped to structs as follows:
 
-```
+```typescript
 {
-  "items": [
-    {"x": 1, "y": 4.0040000000000004, "z": 1.0009999999999994},
-    {"x": 2, "y": 4.371033333333333, "z": 0.36703333333333266},
-    {"x": 3, "y": 5.171833333333334, "z": 0.4337666666666671},
-    {"x": 4, "y": 6.473133333333333, "z": 0.36703333333333354},
+  items: [
+    {x: 1, y: 4.0040000000000004, z: 1.0009999999999994},
+    {x: 2, y: 4.371033333333333, z: 0.36703333333333266},
+    {x: 3, y: 5.171833333333334, z: 0.4337666666666671},
+    {x: 4, y: 6.473133333333333, z: 0.36703333333333354},
     ...
   ]
 }
@@ -157,7 +162,7 @@ An additional format `Protobuf (mixed)` is added to the comparison that uses `pr
  
 All protobuf-implementations in the test uses the following proto-file as schema.
 
-```
+```protobuf
 syntax = "proto3"; 
 
 message Item {
@@ -183,10 +188,10 @@ During decoding, `protobufjs`, `Protobuf (mixed)` performed the fastest at about
 
 ### Payload results
 
-| | JSON |JS|Google|Protons|mixed|
-|---|---|---|---|---|---
-|Size ratio|1.00|0.41|0.41|0.41|0.41|
-|Payload limit|298 MB|153 MB|98 MB| 40 MB| 372 MB
+| | JSON |JS|Google|Protons|Pbf|mixed|
+|-|-|-|-|-|-|-
+|Size ratio|1.00|0.41|0.41|0.41|0.41|0.41|
+|Payload limit|298 MB|153 MB|98 MB|40 MB|372 MB|372 MB
 
 > This table shows the encoded size ratio (compared to JSON) as well as the estimated maximum safe payload limit (measured as JSON) each implementation was able to process.
 
@@ -197,25 +202,24 @@ All implementations stayed consistent to the protobuf format and resulted in an 
 
 ### Data pollution during decoding
 
-| | JSON |JS|Google|Protons|mixed
-|---|---|---|---|---|---
-|Prototype pollution      | |x| |x|x
-|Getters/Setters| | | |x| 
+| |JSON|JS|Google|Protons|Pbf|mixed
+|-|-|-|-|-|-|-
+|Prototype pollution      | |x| |x| |x
+|Getters/Setters| | | |x| | | 
 |Requires unwrapping| | |x| | 
 |Unexpected field renames| | |x| | 
 
 > This table shows an overview of negative effects during decoding.
 
+`Pbf` convert cleanly to JavaScript without any detected renmnats from the encoding process.
 
-Most of the measured implementations add additional metadata to the prototype of the decoded data.
+`protobuf-js` (which also affects `Protobuf (mixed)`) contains some additional serialization remnants (such as type name) hidden in the prototype, but should be mostly usable as a plain data object.
+
+`protons` should be usable as a data object, but wraps all fields into getters/setters that could decrease performance. 
 
 `google-protobuf` is wrapped in a builder pattern and need to be converted before it can be used, and also introduce unexpected field renames. It is however free from metadata after the final conversion.
 
-`protons` is still usable but wraps all fields into getters/setters that could affect performance. 
-
-`protobuf-js` (which also affects `Protobuf (mixed)`) contains some additional serialization remnants  hidden in the prototype, but should be mostly usable as a plain data object.
-
-It is as of now unkown if any of the raw decoded formats incur an additional overhead to plain objects as this is outside the current scope of this article, but it is something to keep in mind.
+It is as of now unkown if any of the polluted formats incur an additional overhead to plain objects as this is outside the current scope of this article, but it is something to keep in mind.
 
 ### Remarks
 
@@ -227,6 +231,13 @@ During encoding it provided mixed result. At sizes below 1 MB it mostly performs
 
 It was the only implementation that reached its max payload limit of 153 MB during encoding, all other formats reached their limit at decoding. It was discoverd however that it is able to decode payloads (created by other implementations) of greater sizes, up to 372 MB.
 
+#### Protobuf (JS)
+
+`Pbf` is average at encoding and decoding.
+
+It performed slightly faster than native JSON during encoding, and about the same during decoding.
+
+It is however the only Protobuf format that is converted cleanly to JavaScript, which could be a distinct advantage.
 
 #### Protobuf (Protons)
 
@@ -243,7 +254,7 @@ It was only able to decode payloads of 47 MB in size, but opposite to `protobuf-
 
 It does not seem to have an option for deserializing directly form JSON. Instead the following `Items` and `Item` classes are generated by the protocol buffer compiler that generates a Java-esque builder pattern that the date needs to be mapped into, as outlined here:
 
-```
+```typescript
 ...
 const ItemsWrap = Schema.Items;
 const ItemWrap = Schema.Item;
@@ -292,7 +303,7 @@ During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all pe
 ### Payload results
 
 | |JSON|BSON|Protobuf (JS)|Protobuf (mixed)|AVRO|JSBIN
-|---|---|---|---|---|---|---
+|-|-|-|-|-|-|-
 |Size ratio|1.00|0.79|0.42|0.42|0.32|0.32
 |Payload limit|298 MB|21 MB| 153 MB| 372 MB|372 MB| 372 MB
 
@@ -305,7 +316,7 @@ During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all pe
 ### Data pollution during decoding
 
 | |BSON|JSBIN|AVRO|Protobuf (JS)|Protobuf (mixed)
-|---|---|---|---|---|---
+|-|-|-|-|-|-
 |Prototype pollution | | |x|x|x|
 
 > This table shows an overview of negative effects during decoding.
@@ -316,9 +327,46 @@ During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all pe
 
 ### Remarks
 
-#### AVRO
+#### AVRO (Avsc)
 
-`avro-js` is the fastest measured implementation at encoding, fast at decoding, has a very good size ratio and is good at handling large payloads.
+`avsc` is the fastest measured implementation at encoding, fast at decoding, has a very good size ratio and is good at handling large payloads.
+
+It is also very flexible at defining a schema. Normally an Avro schema is defined in JSON as in this example: 
+
+```typescript
+// Type for "double[][]"
+const type = avsc.Type.forSchema({
+  "type": "array",
+  "items": {
+    "type": "array",
+    "items": "float"
+  }
+});
+type.schema(); // { "type": "array", ... }
+```
+
+But in `avsc` the same schema can be deferred from the data as:
+
+```typescript
+// Type for "double[][]"
+const inferredType = avsc.Type.forValue([[0.5]]);
+inferredType.schema(); // { "type": "array", ... }
+```
+
+Or as a more complex objects:
+```typescript
+const AVSC_INT = 0;
+const AVSC_FLOAT = 0.5;
+const AVSC_DOUBLE = Infinity;
+
+// Type for "{items: { x?: number, y?: number, z?: number}[]}"
+const complexType = avsc.Type.forValue({
+  items: [
+    { x: AVSC_INT, y: AVSC_DOUBLE, z: AVSC_DOUBLE },
+    { x: null, y: null, z: null }
+  ]
+});
+```
 
 #### BSON
 
@@ -329,61 +377,87 @@ During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all pe
 
 `js-binary` is fast at both encoding and decoding, has a very good size ratio is good at handling large payloads and is decoded cleanly without added metadata.
 
+Similar to `avsc` it also has a more succint schema definition than most other implementations.
+
+``` typescript
+// Type for double[][]
+// Note that all float types in js-binary is 64-bit
+const type = new JsBin.Type([['float']]);
+
+// Type for {x?: int, y?: double, z?: double}[]
+const complexType = new JsBin.Type({
+  items: [
+    { 'x?': 'int', 'y?': 'float', 'z?': 'float' },
+  ],
+});
+```
+
+
 
 ## Result (extra)
 
-As mentioned in the Benchmark chapter not all formats where able to handle the unmapped data. 
+As mentioned in the Benchmark chapter the original data needed to be simplified to a more verbose format that was supported by all serialization formats. As the unmapped data is more compact and contains less reduntant information, additional performance could potentially be gained if the target application uses a similar representation internally. This will be investigated for `avsc`, `js-binary`, `bson` in this section. 
+
+As neither formats supports tuples, the tuple will be encoded as a 64-bit float array which is expected to increase encoded size ratio slightly as the first field of the tuple can no longer be encoded as a 32-bit integer.
+
+`avsc`, `js-binary` also has additional settings such as "optional fields", and `js-binary` has the datatype JSON that will be investigated with regards to performance.
+
+### Performance graphs
+
+#### JSON
+
+![Benchmark of binary serialization](img/bench-json-extra.svg)
+
+> Performance graph of `JSON` with different settings.
+
+| |JSON|JSON (unmapped)
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|Size ratio|1.00|0.77
+
+Switching to unmapped data improved both encoding (1/4 faster) and decoding (1/3 faster). It also reduced size ratio to 0.77 of the original JSON.
+
+#### AVRO Avsc
+
+![Benchmark of binary serialization](img/bench-avro-extra.svg)
+
+> Performance graph of `avsc` with different settings.
+
+| |AVRO Ascv|AVRO Ascv (optional)|AVRO Ascv (unmapped)|
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|Size ratio|0.32|0.38|0.49
+|Payload limit|372 MB|372 MB|237 MB
+
+Making all fields `optional` did decrease performance somewhat from about 10 faster to 4 times faster (though still faster than most other formats). It also increase size ratio slightly.
+
+Switching to `unmapped` data also worsened performance similarly. One plausable explanation could be that the tuples are encoded as a dynamically sized array, which would make sense as the schema does not contain any information about the size of the tuple. However, performance is still good compared to other formats. Size ratio was also increased by 63% which is higher than expected as switching from 2 64-bit + 1 32-bit value to 3 64-bit values would only indicate a 20% increase.
 
 
+#### JSBIN
 
-However, in 
+![Benchmark of binary serialization](img/bench-jsbin-extra.svg)
 
+> Performance graph of `js-binary` with different settings.
 
+| |JSBIN|JSBIN (optional)|JSBIN (unmapped)|JSBIN JSON (unmapped)
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|Size ratio|0.32|0.38|0.48|0.77
 
+Switching to `unmapped` had a slight improvement on encoding speed, but apart from this `optional` and `unmapped` had almost no impact on performance.
 
+Increase in size ratio for both `optional` and `unmapped` is identical to `avsc`.
 
- not investigated by this article.
+Encoding all data using the `js-binary` datatype `json` performed almost identically to `JSON (unmapped)` as well as size ratio. This seems to indicate that datatype `json` simply consists of using native JSON to create a string that is then stored as datatype `string` in `js-binary`.
 
+#### BSON
 
+![Benchmark of binary serialization](img/bench-bson-extra.svg)
 
+> Performance graph of `bson` with different settings.
 
- not investigated in this article, . However, the unmapped data includes less repeated information which could improve performance.
+| |BSON|BSON (unmapped)
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-
+|Size ratio|0.79|0.79|0.48|0.77
 
+Unmapped BSON is still slower than JSON in most cases, but it did receive a performance improvement, especially during decoding.
 
-
-
- it (although unmeasured here) would incur performance overhead of mapping the data.
-
-The mapping process of the data is excluded from the benchmark, but
-
-It is worth to keep in mind that in addition to the 
-
-### Unmapped data result graph
-
-| |JSON|JSON (unmapped)|JSBIN|JSBIN (unmapped)|BSON|BSON (unmapped)
-|---|---|---|---|---|---|---
-|Size ratio|1.00|0.77|0.32|0.48|0.79|0.79
-
-> This graph shows the relative performance of
-
-
-### Unmapped data result graph
-
-![Benchmark of binary serialization](img/bench-unmapped.svg)
-
-> This graph shows the relative performance of 
-
-### Discussion
-
-`js-binary` did not have any measurable performance improvement by switching to unmapped data. It did however increase the size ratio of the encoded data . This is due to the first element in each tuple being encoded as a double instead of a
-
-
-
-![Benchmark of binary serialization](img/bench-jsbin.svg)
-
-
-| |JSON|JSBIN|JSBIN (optional)|JSBIN JSON (unmapped)
-|---|---|---|---|---|---|---
-|Size ratio|1.00|0.032|0.38|0.77
-
-
+For some unexplained reason the encoded size ratio remaind the same for both the mapped and unmapped data. This seems to indicate that BSON is able to optimize duplicate data, although the encoded size ratio is still  relatively large compared to other formats.
