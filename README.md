@@ -489,7 +489,7 @@ Regarding Protocol Buffer libraries it should be noted that all fields are optio
  
 `protobuf-js` was slow at encoding but fast at decoding, `protons` was fast at encoding but very slow at decoding. However, through a combination of using `protons` during encoding and `protobuf-js` during decoding, performance on pair with `js-binary` (with slightly worse encoding size) could be achieved. 
  
-`pbf` is performed only slightly better than native JSON but is deserialized cleanly without any remnants.
+`pbf` performed only slightly better than native JSON but is deserialized cleanly without any remnants.
  
 `bson` was slower than native JSON at both encoding and decoding, provided only a modest compression ratio, and was bad at handling large payloads, but does not require a schema and is deserialized cleanly.
  
