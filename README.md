@@ -6,7 +6,22 @@ I was myself trying to decide what binary serialization format I should use with
  
 By sharing my findings, I hope it can be of help (and save time) to someone in a similar situation and perhaps inspire some developers to try out binary serialization.
  
-For those in a hurry, feel free to only read the Abstract and Conclusion sections.
+For those in a hurry, feel free to skip to the Abstract and Conclusion sections.
+
+## Table of content
+
+
+- [Table of content](#table-of-content)
+- [Abstract](#abstract)
+- [Introduction](#introduction)
+- [Setup](#setup)
+- [Disclaimer](#disclaimer)
+- [Libraries](#libraries)
+- [Benchmark](#benchmark)
+- [Result (Protocol Buffers)](#result-protocol-buffers)
+- [Result (final)](#result-final)
+- [Result (extra)](#result-extra)
+- [Conclusion](#conclusion)
  
 ## Abstract
  
@@ -470,7 +485,8 @@ For some unexplained reason the encoded size ratio remained the same for both th
  
 Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it at the top. As with many other measured libraries, some remnants of the deserialization process are left in the prototype of the decompiled data which could be a disadvantage in some cases.
  
-`js-binary` performed well in all measurement, was easy to setup and is deserialized cleanly. One disadvantage being that it uses a custom binary format that does not seem to be available in other programming languages. Switching from mandatory to optional fields had almost no impact on performance.
+`js-binary` performed well in all measurement, was easy to setup and is deserialized cleanly. One disadvantage bei
+ng that it uses a custom binary format that does not seem to be available in other programming languages. Switching from mandatory to optional fields had almost no impact on performance.
  
 `protobuf-js` was slow at encoding but fast at decoding, `protons` was fast at encoding but very slow at decoding. However, through a combination of using `protons` during encoding and `protobuf-js` during decoding, performance on pair with `js-binary` (with slightly worse encoding size) could be achieved. 
  
