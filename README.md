@@ -84,14 +84,14 @@ Feel free to inspect my implementations in `src/benchmarks.ts`, and let me know 
  
 The following libraries and versions are tested (sorted by weekly downloads):
  
-* `protobufjs "6.10.1" - 3,449k downloads`
-* `bson "4.0.4" - 1,826k downloads`
-* `pbf "3.2.1" - 431k downloads`
-* `google-protobuf "4.0.0-rc.1" - 348k downloads`
-* `avsc "5.4.21" - 43k downloads`
-* `protons "1.2.1" - 30k downloads`
-* ~~`avro-js "1.10.0" - 1.2k downloads`~~
-* `js-binary "1.2.0" - 0.3k downloads`
+* `protobufjs "6.10.1"` - 3,449k downloads
+* `bson "4.0.4"` - 1,826k downloads
+* `pbf "3.2.1"` - 431k downloads
+* `google-protobuf "4.0.0-rc.1"` - 348k downloads
+* `avsc "5.4.21"` - 43k downloads
+* `protons "1.2.1"` - 30k downloads
+* ~~`avro-js "1.10.0"` - 1.2k downloads~~
+* `js-binary "1.2.0"` - 0.3k downloads
  
 They are categorized as:
  
