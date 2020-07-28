@@ -10,8 +10,6 @@ For those in a hurry, feel free to skip to the Abstract and Conclusion sections.
 
 ## Table of content
 
-
-- [Table of content](#table-of-content)
 - [Abstract](#abstract)
 - [Introduction](#introduction)
 - [Setup](#setup)
