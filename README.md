@@ -169,10 +169,10 @@ This wrapped struct array is the final "payload" that is used in the benchmark u
 It should be noted that the time to convert the unmapped data to the mapped structs is excluded from all measurements in the benchmark.
  
 ### Precautions
- 
-It was discovered that some libraries can considerably impact the performance of other libraries when measured in the same running process, possible also due to memory reuse. To prevent this (and to get reproducible results) all measurements in the results section has been measured with each implementation running in an isolated Node.js process.
 
 Each appended element in the growing array is modified slightly so that all elements are unique.
+ 
+It was discovered that some libraries can considerably impact the performance of other libraries when measured in the same running process, possible due to memory reuse. To prevent this (and to get reproducible results) all measurements in the results section has been measured with each implementation running in an isolated Node.js process.
  
 To reduce unpredictable stalls by the automatic garbage collector in Node.js, the garbage collector is forcefully triggered before each measurement. This did not have any discernable impact on the measured performance other than reducing some randomness.
  
