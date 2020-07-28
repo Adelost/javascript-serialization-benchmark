@@ -5,8 +5,23 @@ This is a comparison and benchmark of various binary serialization formats used 
 I was myself trying to decide what binary serialization format I should use with regard to performance, compression size and ease of use in my personal projects, and before I knew it I had spent the last few days doing a rather extensive comparison.
  
 By sharing my findings, I hope it can be of help (and save time) to someone in a similar situation and perhaps inspire some developers to try out binary serialization.
- 
-For those in a hurry, feel free to skip to the Abstract and Conclusion sections.
+
+## TL;DR
+
+Based on the current benchmark results in this article I would rank the top libraries in the following order:
+
+1. `avsc`
+2. `js-binary`
+3. `protobuf-js`
+4. `pbf`
+5. `bson`
+
+Due to various reasons outlined in the article, I would not currenly recommend the following libraries:
+
+* `protons`
+* `google-protobuf`.
+
+Feel free to skip to the Abstract and Conclusion sections of the article to read the summarized motivation.
 
 ## Table of content
 
@@ -23,7 +38,7 @@ For those in a hurry, feel free to skip to the Abstract and Conclusion sections.
  
 ## Abstract
  
-The following JavaScript serialization libraries and versions are compared with regards to performance, compression size and ease of use:
+The following JavaScript serialization libraries and versions are compared with regards to performance, compression size and ease of use against JavaScript's native JSON library:
  
 * `protobufjs "6.10.1"` 
 * `bson "4.0.4"` 
@@ -45,17 +60,17 @@ During decoding, `avsc`, `protobufjs`, `js-binary` all performed similarly well 
  
 ## Introduction
  
-Data serialization is ubiquitous in most areas such as sending and receiving data over the network or storing/reading data from the file system. While JSON is a common modus operandi (especially in JavaScript), using a binary serialization format typically provides and advantage in compression size and performance at the cost of losing human readability of the encoded data.
+Data serialization is ubiquitous in most areas such as sending and receiving data over the network or storing/reading data from the file system. While JSON is a common modus operandi (especially in JavaScript), using a binary serialization format typically provides an advantage in compression size and performance at the cost of losing human readability of the encoded data.
  
 Two common binary serialization formats across many programming languages are Protocol Buffers and Apache Avro. Avro is inherently a bit more compact than Protobuf, whereas Protobuf uses the additional data as field tags that could make it slightly more forgiving when changing the schema. For those interested, an excellent in-depth explanation has already been written by Martin Kleppmann: https://martin.kleppmann.com/2012/12/05/schema-evolution-in-avro-protocol-buffers-thrift.html
  
-In addition to this, several more recent JavaScript oriented libraries will be included in the comparison.
+In addition to this, several more recent JavaScript-oriented libraries will be included in the comparison.
  
 This article will mostly focus on the performance aspect and provide a brief overview of each implementation, but as always, there will be pros and cons of each implementation that could be overlooked depending on your use-case.
  
 ## Setup
  
-To run the benchmark yourself, follow these steps.
+To reproduce the benchmark results, follow these steps.
  
 * Install Node.js ( `12.18.3 LTS` is recommended). 
 * Install dependencies:
@@ -63,7 +78,7 @@ To run the benchmark yourself, follow these steps.
 ```shell script
 npm install
 ``` 
-* Use the default configuration or modify `src/config.ts` as you see fit.
+* Use the default configuration or modify `src/config.ts`.
 * Select what libraries to test by changing `run-tests.sh` or use default that tests all libraries.
 * Run `run-tests.sh` (if you are on Windows use Git BASH or similar):  
  
@@ -86,7 +101,7 @@ Measurements are accumulated into `src/tmp/plot.json` each benchmark iteration. 
  
 This article only focuses on measurements using JavaScript. Many of the measured formats support additional programming languages that could have different performance characteristics than indicated in this benchmark.
  
-Although outside the scope of this article, compression size (and there by network transfer speed) can be further improved at the cost of encoding/decoding performance by combining the output with a compressor/decompressor library such `google/snappy` or `zlib`.
+Although outside the scope of this article, compression size (and thereby network transfer speed) can be further improved at the cost of encoding/decoding performance by combining the output with a compressor/decompressor library such `google/snappy` or `zlib`.
  
 This is the first time I use many of the listed libraries and as such there might still be additional optimizations that I am unaware of. Still, I believe my implementation is a good indication to what most users will end up using.
  
@@ -97,27 +112,27 @@ Feel free to inspect my implementations in `src/benchmarks.ts`, and let me know 
  
 The following libraries and versions are tested (sorted by weekly downloads):
  
-* `protobufjs "6.10.1"` - 3,449k downloads
-* `bson "4.0.4"` - 1,826k downloads
-* `pbf "3.2.1"` - 431k downloads
-* `google-protobuf "4.0.0-rc.1"` - 348k downloads
-* `avsc "5.4.21"` - 43k downloads
-* `protons "1.2.1"` - 30k downloads
-* ~~`avro-js "1.10.0"` - 1.2k downloads~~
-* `js-binary "1.2.0"` - 0.3k downloads
+* `protobufjs "6.10.1"` - 3,449k
+* `bson "4.0.4"` - 1,826k
+* `pbf "3.2.1"` - 431k
+* `google-protobuf "4.0.0-rc.1"` - 348k
+* `avsc "5.4.21"` - 43k
+* `protons "1.2.1"` - 30k 
+* ~~`avro-js "1.10.0"` - 1.2k~~
+* `js-binary "1.2.0"` - 0.3k
  
 They are categorized as:
  
-* Protocol Buffer ( `protobufjs` , `pbf`, `google-protobuf` , `protons` ): `google-protobuf` is Googles official release, but `protobufjs` is by far the most popular, possible due to it being easier to use. To further compare against `protobufjs` a third library called `protons` is included.  
-* BSON ( `bson` ): BSON stands for Binary JSON and is popularized by its use in MongoDB. 
-* Avro ( `avsc`, `avro-js` ): `avsc` seems to be the most popular Avro library. `avro-js` appears to be an offical release by the Apache Foundation but this was excluded from the result section as it seems to be based on a older version on `avsc`, and both libraries yielded very similar benchmark results with a slight advantage to `avsc`.
-* JS-Binary ( `js-binary` ): The most obscure (judging by weekly downloads). Still `js-binary` seemed like a good contender due to it being easy to use (having a very compact and flexible schema-format) and being optimized for JavaScript. The main drawback being that it will be difficult to use in other programming languages should the need arise.
+* Protocol Buffer (`protobufjs`, `pbf`, `google-protobuf`, `protons`): `google-protobuf` is Google's official release, but `protobufjs` is by far more popular library. To further compare against `protobufjs`, a third library called `protons` is included.  
+* BSON (`bson`): BSON stands for Binary JSON and is popularized by its use in MongoDB. 
+* Avro (`avsc`, `avro-js`): `avsc` seems to be the most popular Avro library. `avro-js` appears to be an offical release by the Apache Foundation but this was excluded from the result section as it seems to be based on a older version on `avsc`, and both libraries yielded very similar benchmark results with a slight advantage to `avsc`.
+* JS-Binary (`js-binary`): `js-binary` is the most obscure library (judging by weekly downloads) and it also uses a custom binary format that could make interoperability with other programming languages difficult, but this could also make it a good choice due to it being designed with JavaScript in mind.
  
 ## Benchmark
  
-Each format will be compared against JavaScripts built in JSON library as a baseline, regarding compression size and encoding/decoding time. 
+Each format will be compared against JavaScript's native JSON library as a baseline, regarding compression size and encoding/decoding time. 
  
-The data used in the benchmark is a growing array of tuples that is grown in increments of 1/8 below 10 MB, at each iteration and to speed things up 1/4 above 10 MB. In a real scenario it could be thought of as a list of vectors in a 2D or 3D space, such as a 3D-model or similarly data intensive object. 
+The data used in the benchmark is a growing array of tuples that is grown in increments of 1/8 of its previous size at each iteration, and (to speed things up) 1/4 when reaching sizes above 10 MB. In a real scenario it could be thought of as a list of vectors in a 2D or 3D space, such as a 3D-model or similarly data intensive object. 
  
 To further complicate things the first element of the tuple is an integer. This will give a slight edge to some serialization-formats as an integer can be represented more compact in binary rather than floating-point number. 
  
@@ -135,7 +150,7 @@ The data is as follows:
 ]
 ``` 
  
-The first challenge that arose is that not all serialization formats supports root level arrays, and almost no one seems to support tuples, and as such the arrays first need to be mapped to structs as follows:
+The first challenge that arose is that not all measured serialization formats supports root level arrays, and almost no one seems to support tuples, and as such the arrays first need to be mapped to structs as follows:
  
 ```typescript
 {
@@ -149,23 +164,23 @@ The first challenge that arose is that not all serialization formats supports ro
 }
 ``` 
  
-This wrapped struct array is the final payload that is used in the benchmark unless specified otherwise.
- 
-This further gives an advantage to some formats over JSON as duplicate information such as field names can be encoded more efficiently in a schema.
+This wrapped struct array is the final "payload" that is used in the benchmark unless specified otherwise. This further gives an advantage to some formats over JSON as duplicate information such as field names can be encoded more efficiently in a schema.
+
+It should be noted that the time to convert the unmapped data to the mapped structs is excluded from all measurements in the benchmark.
  
 ### Precautions
  
-Each appended element in the growing array is modified slightly so that all elements are unique. This is to prevent unpredictable object reuse that could impact measurements.
+It was discovered that some libraries can considerably impact the performance of other libraries when measured in the same running process, possible also due to memory reuse. To prevent this (and to get reproducible results) all measurements in the results section has been measured with each implementation running in an isolated Node.js process.
+
+Each appended element in the growing array is modified slightly so that all elements are unique.
  
-It was also discovered that some libraries can considerably impact the performance of other libraries when measured in the same running process. To prevent this (and to get reproducible results) all measurements in the results section has been measured with each implementation running in an isolated Node.js process.
- 
-To reduce unpredictable stalls by the automatic garbage collector in Node.js, the garbage collector is forcefully triggered before each measurement. This does not seem to have any discernable impact on the measured performance other than reducing some randomness.
+To reduce unpredictable stalls by the automatic garbage collector in Node.js, the garbage collector is forcefully triggered before each measurement. This did not have any discernable impact on the measured performance other than reducing some randomness.
  
 ### Unmapped data
  
-It should be noted that the time to convert the unmapped data to the mapped structs is excluded from all measurements in the benchmark. Although unmeasured in this article, mapping the data would probably neglect many performance benefit of the selected format and as such, if your application internally uses a similar data representation to the unmapped data you probably want to pick a serialization format that supports its unmapped form.
- 
-However, the unmapped formatted is more compact (at the cost of readability) and contains less redundant information that could improve serialization performance. To those interested there exists an extra result section with results marked as `(unmapped)` that uses the original unmapped array of arrays data to compare against the performance of the mapped array.
+Compared to the mapped (object with array of structs) data, the unmapped (array of arrays) data is more compact and contains less redundant information. As such additional performance could potentially be gained if the target application uses a similar representation internally.
+
+This is investigated in an additional result section that is found after the main result section.
  
 ### Hardware
  
@@ -173,9 +188,9 @@ The benchmark is done in Node.js v12.16.3 on 64-bit Windows 10, with an Intel i7
  
 ## Result (Protocol Buffers)
  
-Because of its popularity, Protocol Buffer was tested more rigorously than the other formats and is thus given this dedicated section.
+Protocol Buffer was tested more rigorously than the other formats and is thus given this dedicated section.
  
-An additional format `Protobuf (mixed)` is added to the comparison that uses `protons` during encoding and `protobuf-js` during decoding, which is explained further down. 
+An additional format `Protobuf (mixed)` is added to the comparison that uses `protons` during encoding and `protobuf-js` during decoding (this is explained further down). 
  
 All protobuf-implementations in the test uses the following proto-file as schema.
  
@@ -203,7 +218,7 @@ It should be noted that all fields in version "proto3" are optional by default, 
  
 During encoding `protons` and `Protobuf (mixed)` perfomed the fastest at 2 times faster than native JSON at most payload sizes. `protobufjs` and `google-protobuf` perfomed the slowest at about 2-3 times slower.
  
-During decoding, `protobufjs`, `Protobuf (mixed)` performed the fastest at about 5 times faster than native JSON at most payload sizes (although native JSON catches up again at payloads above 200 MB). `protons` performed by far the slowest at 20-30 times slower.
+During decoding, `protobufjs`, `Protobuf (mixed)` performed the fastest at about 5 times faster than native JSON at most payload sizes (although native JSON catches up again at payloads above 200 MB). `protons` performed by far the slowest; 20-30 times slower, compared to native JSON.
  
 ### Payload results
  
@@ -252,7 +267,7 @@ It was the only implementation that reached its max payload limit of 153 MB duri
  
 #### Protobuf (Pbf)
  
-`pbf` is average at encoding and decoding, but is decoded cleanly without added remnants.
+`pbf` is average at encoding and decoding, but is deserialized cleanly without added remnants.
  
 By default `pbf` requires an extra build step where boilerplate code is generated from `.proto` file, though it seems to offer a few alternatives to streamline the process.
  
@@ -388,12 +403,12 @@ const complexType = avsc.Type.forValue({
  
 #### BSON
  
-`bson` is slow at both encoding and decoding and bad at handling large paylods, but does not require a schema and is decoded cleanly without added remnants.
+`bson` is slow at both encoding and decoding and bad at handling large paylods, but does not require a schema and is deserialized cleanly without added remnants.
  
  
 #### JSBIN
  
-`js-binary` is fast at both encoding and decoding, has a very good size ratio is good at handling large payloads and is decoded cleanly without added remnants.
+`js-binary` is fast at both encoding and decoding, has a very good size ratio is good at handling large payloads and is deserialized cleanly without added remnants.
  
 Like `avsc` it also has a more succinct schema definition than most other implementations.
  
@@ -480,10 +495,10 @@ For some unexplained reason the encoded size ratio remained the same for both th
  
  
 ## Conclusion
+
+Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it on top. Performance was also slightly worse when processing small arrays compared to similar sized structs. As with many other measured libraries, some remnants of the deserialization process are left in the prototype of the decompiled data which could be a disadvantage in some cases.
  
-Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it on top. As with many other measured libraries, some remnants of the deserialization process are left in the prototype of the decompiled data which could be a disadvantage in some cases.
- 
-`js-binary` performed well in all measurement, was easy to setup and is deserialized cleanly. One disadvantage being that it uses a custom binary format that does not seem to be available in other programming languages. Switching from mandatory to optional fields had almost no impact on performance.
+`js-binary` performed well in all measurements, was easy to setup and is deserialized cleanly. One disadvantage being that it uses a custom binary format that could make interoperability with other programming languages difficult. Switching from mandatory to optional fields had almost no impact on performance.
 
 Regarding Protocol Buffer libraries it should be noted that all fields are optional by default in the latest schema version.
  
