@@ -16,7 +16,7 @@ Based on the current benchmark results in this article I would rank the top libr
 4. `pbf`
 5. `bson`
 
-Due to various reasons outlined in the article, I would not currenly recommend the following libraries:
+Due to various reasons outlined in the article I would not currenly recommend the following libraries:
 
 * `protons`
 * `google-protobuf`
