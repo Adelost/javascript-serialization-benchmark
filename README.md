@@ -19,9 +19,9 @@ Based on the current benchmark results in this article I would rank the top libr
 Due to various reasons outlined in the article, I would not currenly recommend the following libraries:
 
 * `protons`
-* `google-protobuf`.
+* `google-protobuf`
 
-Feel free to skip to the Abstract and Conclusion sections of the article to read the summarized motivation.
+Feel free to skip to the [Abstract](#abstract) and [Conclusion](#conclusion) sections of the article to read the summarized motivation.
 
 ## Table of content
 
