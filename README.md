@@ -1,6 +1,6 @@
-# Binary serialization comparison in JavaScript (as of 2020-07-28)
+# Binary serialization comparison in JavaScript
  
-This is a comparison and benchmark of various binary serialization formats used in JavaScript.
+This is a comparison and benchmark of various binary serialization formats used in JavaScript as of 2020-07-28.
  
 I was myself trying to decide what binary serialization format I should use with regard to performance, compression size and ease of use in my personal projects, and before I knew it I had spent the last few days doing a rather extensive comparison.
  
