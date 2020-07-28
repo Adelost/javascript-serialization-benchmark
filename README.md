@@ -481,7 +481,7 @@ For some unexplained reason the encoded size ratio remained the same for both th
  
 ## Conclusion
  
-Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it at the top. As with many other measured libraries, some remnants of the deserialization process are left in the prototype of the decompiled data which could be a disadvantage in some cases.
+Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it on top. As with many other measured libraries, some remnants of the deserialization process are left in the prototype of the decompiled data which could be a disadvantage in some cases.
  
 `js-binary` performed well in all measurement, was easy to setup and is deserialized cleanly. One disadvantage being that it uses a custom binary format that does not seem to be available in other programming languages. Switching from mandatory to optional fields had almost no impact on performance.
 
