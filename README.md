@@ -2,37 +2,50 @@
  
 This is a comparison and benchmark of various binary serialization formats and libraries used in JavaScript as of 2020-07-28.
  
-I was myself trying to decide what binary serialization format I should use with regard to performance, compression size and ease of use in my personal projects, and what started out as a simple project soon turned into a rather extensive comparison.
+I was myself trying to decide what binary serialization format I should use in my personal projects, and what started out simple soon turned into a rather extensive comparison.
  
 By sharing my findings, I hope it can be of help (and save time) to someone in a similar situation and perhaps inspire some developers to try out binary serialization.
 
-## TL;DR
+## TL;DR (or Abstract)
 
-The following formats and libraries are compared in this article:
+This article and benchmark attempts to answer what binary serialization library to use with regard to performance, compression size and ease of use.
+
+The following formats and libraries are compared:
 
 * Protocol Buffer: `protobuf-js`, `pbf`, `protons`, `google-protobuf`
 * Avro: `avsc`
 * BSON: `bson`
+* BSER: `bser`
 * JSBinary: `js-binary`
 
-Based on the current benchmark results in this article I would rank the top libraries in the following order:
+Based on the current benchmark results in this article, the author would rank the top libraries in the following order compared to JSON (given as x times faster at values greater than 1.0, or slower at values below):
 
-1. `avsc`
-2. `js-binary`
-3. `protobuf-js`
-4. `pbf`
-5. `bson`
+1. `avsc`: 10x encoding, 3-10x decoding
+2. `js-binary`: 2x encoding, 2-8x decoding
+3. `protobuf-js`: 0.5-1x encoding, 2-6x decoding,
+4. `pbf`: 1.2x encoding, 1.0x decoding
+5. `bser`: 0.5x encoding, 0.5x decoding
+6. `bson`: 0.5x encoding, 0.7x decoding
 
-Due to various reasons outlined in the article I would not currenly recommend the following libraries:
+Ranked by encoded size (compared to JSON) only:
 
-* `protons`
-* `google-protobuf`
+1. `avsc`, `js-binary`: 32%:
+2. `protobuf-js`, `pbf`, `protons`, `google-protobuf`: 42%
+3. `bser`: 67%
+4. `bson`: 79%
+5. `JSON`: 100%
 
-Feel free to skip to the [Abstract](#abstract) and [Conclusion](#conclusion) sections of the article to read the summarized motivation. For performance graphs and detailed measurements skip to [Result (final)](#result-final).
+Due to performance or various other reasons outlined in the article, the author would not currenly recommend the following libraries:
+
+* `protons`: 2x encoding, 0.05x decoding
+* `google-protobuf`: 0.3-0.5x encoding, 0.8x decoding
+
+
+Feel free to skip to the [Conclusion](#conclusion) sections of the article to read the summarized motivation. For performance graphs and detailed measurements skip to [Result (final)](#result-final).
+
 
 ## Table of content
 
-- [Abstract](#abstract)
 - [Introduction](#introduction)
 - [Setup](#setup)
 - [Disclaimer](#disclaimer)
@@ -42,31 +55,7 @@ Feel free to skip to the [Abstract](#abstract) and [Conclusion](#conclusion) sec
 - [Result (final)](#result-final)
 - [Result (extra)](#result-extra)
 - [Conclusion](#conclusion)
- 
-## Abstract
- 
-This article and benchmark attempts to answer what binary serialization library to use with regard to performance, compression size and ease of use.
 
-The following JavaScript serialization libraries and versions are compared against each other and JavaScript's native JSON library:
- 
-* `protobufjs "6.10.1"` 
-* `bson "4.0.4"` 
-* `pbf "3.2.1"`
-* `google-protobuf "4.0.0-rc.1"`
-* `avsc "5.4.21"` 
-* `protons "1.2.1"` 
-* `js-binary "1.2.0"` 
- 
-During encoding, `avsc` performed the fastest at 10 times faster than native JSON at most payload sizes, followed by `js-binary`, `protons` at 2 times faster. `protobufjs` and `bson` performed the slowest at about 3 times slower than native JSON.
- 
-During decoding, `avsc`, `protobufjs`, `js-binary` all performed similarly well at about 5 times faster than native JSON at most payload sizes, though `avsc` seems to have a slight advantage. `protons` performed the slowest at 20-30 times slower, followed by `bson` at 1.5 times slower
- 
-`avsc` and `js-binary` gave the best compression ratio of the encoded data at 0.32 compared to JSON, followed by `protobufjs`, `pbf`, `google-protobuf`, `protons` with a ratio of 0.42.
- 
-`avsc`, `pbf` and `js-binary` were able to handle the largest file sizes at both encoding and decoding, with an estimate of 372 MB (measured as JSON) given the default Node.js-heap size. In general, the maximum file size coincided with the measured encoding/decoding-speed of each implementation.
- 
-`js-binary`, `pbf`, `bson` all convert cleanly back to JavaScript without any detected remnants from the encoding process. `avro-js` and `js-binary` contained minor remnants. `google-protobuf` and `protons` had major remnants or ramifications.
- 
 ## Introduction
  
 Data serialization is ubiquitous in most areas such as sending and receiving data over the network or storing/reading data from the file system. While JSON is a common modus operandi (especially in JavaScript), using a binary serialization format typically provides an advantage in compression size and performance at the cost of losing human readability of the encoded data.
@@ -120,7 +109,8 @@ Feel free to inspect my implementations in `src/benchmarks.ts`, and let me know 
 ## Libraries
  
 The following libraries and versions are tested (sorted by weekly downloads):
- 
+
+* `bser "6.10.1"` - 7,671k
 * `protobufjs "6.10.1"` - 3,449k
 * `bson "4.0.4"` - 1,826k
 * `pbf "3.2.1"` - 431k
@@ -131,11 +121,23 @@ The following libraries and versions are tested (sorted by weekly downloads):
 * `js-binary "1.2.0"` - 0.3k
  
 They are categorized as:
- 
-* Protocol Buffer (`protobufjs`, `pbf`, `google-protobuf`, `protons`): `google-protobuf` is Google's official release, but `protobufjs` is by far more popular library. To further compare against `protobufjs`, a third library called `protons` is included.  
-* BSON (`bson`): BSON stands for Binary JSON and is popularized by its use in MongoDB. 
-* Avro (`avsc`, `avro-js`): `avsc` seems to be the most popular Avro library. `avro-js` appears to be an offical release by the Apache Foundation but this was excluded from the result section as it seems to be based on a older version on `avsc`, and both libraries yielded very similar benchmark results with a slight advantage to `avsc`.
-* JSBinary (`js-binary`): `js-binary` is the most obscure library (judging by weekly downloads) and it also uses a custom binary format that could make interoperability with other programming languages difficult, but this could also make it a good choice due to it being designed with JavaScript in mind.
+
+* Protocol Buffer: `protobuf-js`, `pbf`, `protons`, `google-protobuf`
+* Avro: `avsc`, `avro-js`
+* BSON: `bson`
+* BSER: `bser`
+* JSBinary: `js-binary`
+
+
+`bser` is a binary serialization library developed for Facebook's "Watchman" filewatcher and seems to be the most popular binary serialization library. It is however, mainly used for loca-IPC (inter process communication) as strings are represented as binary with no specific encoding.
+
+`google-protobuf` is Google's official Protocol Buffer release, but `protobufjs` is by far the more popular library.
+
+`avsc` seems to be the most popular Avro library. `avro-js` is an offical release by the Apache Foundation but this was excluded from the result section as it seems to be based on an older version of `avsc`, contains less features and both libraries yielded very similar benchmark results with a slight advantage to `avsc`.
+
+`bson` is the official JavaScript BSON library released by MongoDB.
+
+`js-binary` is the most obscure library (judging by weekly downloads) and uses a custom binary format that could make interoperability with other programming languages difficult, but this could also make it a good choice due to it being designed with JavaScript in mind.
  
 ## Benchmark
  
@@ -223,27 +225,29 @@ It should be noted that all fields in version "proto3" are optional by default, 
  
 ![Benchmark of protocol buffers](img/bench-protobuf.svg)
  
-> This graph shows the encode/decode time of each implementation in seconds as well as ratio (compared to JSON) given the payload size in MB (measured as JSON). Please note that a logaritmic scale is used on the `Encode/Decode time (s)` and `JSON size (MB)` axis.
+> This graph shows the encode/decode time of each implementation in seconds as well as ratio (compared to JSON) given the payload size in MB (measured as JSON). Note that a logaritmic scale is used on the `Encode/Decode time (s)` and `JSON size (MB)` axis.
  
 During encoding `protons` and `Protobuf (mixed)` perfomed the fastest at 2 times faster than native JSON at most payload sizes. `protobufjs` and `google-protobuf` perfomed the slowest at about 2-3 times slower.
  
 During decoding, `protobufjs`, `Protobuf (mixed)` performed the fastest at about 5 times faster than native JSON at most payload sizes (although native JSON catches up again at payloads above 200 MB). `protons` performed by far the slowest; 20-30 times slower, compared to native JSON.
  
-### Payload results
- 
-| | JSON |JS|Google|Protons|Pbf|mixed|
-|---|---|---|---|---|---|---
-|Size ratio|1.00|0.41|0.41|0.41|0.41|0.41|
-|Payload limit|298 MB|153 MB|98 MB|40 MB|372 MB|372 MB
- 
-> This table shows the encoded size ratio (compared to JSON) as well as the estimated maximum safe payload limit (measured as JSON) each implementation was able to process.
- 
-When exceeding the payload limit, given the default JavaScript heap size, a heap allocation error occurred in most cases.
- 
-All implementations stayed consistent to the protobuf format and resulted in an identical compression ratio of 0.41 compared to the corresponding file size of JSON at all measured payload sizes.
- 
- 
-### Data pollution during decoding
+### Compression ratio
+
+All implementations (`protobuf-js`, `pbf`, `protons`, `google-protobuf`) stayed consistent to the Protocol Buffer format and resulted in an identical compression ratio of 42% (compared to the corresponding file size of JSON) at all measured payload sizes.
+
+### Maximum payload size
+
+This is a ranking of the estimated maximum safe payload limit (measured as JSON) each library was able to process:
+
+1. `pbf`, `mixed`: 372 MB
+2. `JSON`: 298 MB
+3. `protobuf-js`: 153 MB
+4. `google-protobuf`: 98 MB
+5. `protons`: 40 MB
+
+ When exceeding the payload limit (given the default JavaScript heap size), a heap allocation error occurred in most cases.
+
+### Negative effects during decoding
  
 | |JSON|JS|Google|Protons|Pbf|mixed
 |---|---|---|---|---|---|---
@@ -256,8 +260,8 @@ All implementations stayed consistent to the protobuf format and resulted in an 
  
 `pbf` convert cleanly to JavaScript without any detected remnats from the encoding process.
  
-`protobuf-js` (which also affects `Protobuf (mixed)`) contains some additional serialization remnants (such as type name) hidden in the prototype but should be mostly usable as a plain data object.
- 
+`protobuf-js` (which also affects `Protobuf (mixed)`) contains serialization remnants (such as type name) hidden in the prototype of the decoded objects, but should behave as a normal plain JavaScript object for most purposes.
+
 `protons` should be usable as a data object but wraps all fields into getters/setters that could decrease performance. 
  
 `google-protobuf` is wrapped in a builder pattern and need to be converted before it can be used and can introduce unexpected field renames. It is however free from metadata after the final conversion.
@@ -336,44 +340,50 @@ This is the final comparison of the various formats.
  
 ![Benchmark of binary serialization](img/bench-full.svg)
  
-> This graph shows the encode/decode time of each implementation in seconds as well as ratio (compared to JSON) given the payload size in MB (measured as JSON). Please note that a logaritmic scale is used on the `Encode/Decode time (s)` and `JSON size (MB)` axis.
+> This graph shows the encode/decode time of each implementation in seconds as well as ratio (compared to JSON) given the payload size in MB (measured as JSON). Note that a logaritmic scale is used on the `Encode/Decode time (s)` and `JSON size (MB)` axis.
  
 During encoding `avro-js` performed the fastest of all implementations (with good margin) at 10 times faster than native JSON at most payload sizes, followed by `js-binary` and `Protobuf (Mixed)` at 2 times faster. Although native JSON once again catches up at payloads above 200 MB (using the default Node.js heap size).
  
 During decoding, `avro-js`, `protobufjs`, `js-binary`, `Protobuf (Mixed)` all performed equally well at about 5 times faster than native JSON at most payload sizes. `bson` performed the slowest at 1.5 times slower.
+
+### Compression ratio
+
+This is a ranking of the encoded size (compared to JSON) of each library:
+
+1. `avsc`, `js-binary`: 32%:
+2. `protobuf-js`, `pbf`: 42%
+3. `bser`: 67%
+4. `bson`: 79%
+5. `JSON`: 100%
+
+### Maximum payload size
+
+This is a ranking of the estimated maximum safe payload limit (measured as JSON) each library was able to process:
+
+1. `avsc`, `jsbin`, `pbf`, `bser`, `Protobuf (mixed)`: 372 MB
+2. `JSON`: 298 MB
+3. `protobuf-js`: 153 MB
+4. `google-protobuf`: 98 MB
+5. `protons`: 40 MB
+6. `bson`: 21 MB
+
+### Negative effects during decoding
  
-### Payload results
- 
-| |JSON|BSON|Protobuf (JS)|Protobuf (mixed)|AVRO|JSBIN
+| |BSON|JSBIN|AVRO|BSER|
 |---|---|---|---|---|---|---
-|Size ratio|1.00|0.79|0.42|0.42|0.32|0.32
-|Payload limit|298 MB|21 MB| 153 MB| 372 MB|372 MB| 372 MB
- 
-> This table shows the encoded size ratio (compared to JSON) as well as the estimated maximum safe payload limit (measured as JSON) each implementation was able to process.
- 
-`avro-js`, `js-binary` gave the best compression ratio of the encoded data at 0.32 compared to JSON, followed by `protobufjs`, `google-protobuf`, `protons` with a ratio of 0.42.
- 
-`avro-js`, `js-binary` was able to handle the largest file sizes at both encoding and decoding, with an estimate of 372 MB (measured as JSON) given the default Node.js-heap size. In general, the maximum file size coincided with the measured encoding/decoding-speed of each implementation.
- 
-### Data pollution during decoding
- 
-| |BSON|JSBIN|AVRO|Protobuf (JS)|Protobuf (mixed)
-|---|---|---|---|---|---
-|Prototype pollution | | |x|x|x|
+|Prototype pollution | | |x| 
  
 > This table shows an overview of negative effects during decoding.
  
-`bson`, `js-binary` all convert cleanly to JavaScript without any detected remnats from the encoding process.
+`bson`, `js-binary` and `bser`, all convert cleanly to JavaScript without any detected remnats from the encoding process.
  
-`avro-js`, `protobuf-js` (which also affects `Protobuf (mixed)`) should be mostly usable as a plain data object but contains some additional serialization remnants hidden in the prototype. 
+`avro-js`, contains serialization remnants (such as type name) hidden in the prototype of the decoded objects, but should behave as a normal plain JavaScript object for most purposes.
  
 ### Remarks
  
 #### AVRO (Avsc)
  
-`avsc` is the fastest measured implementation at encoding, fast at decoding, has a very good size ratio and is good at handling large payloads.
- 
-It is also very flexible at defining a schema. Normally an Avro schema is defined in JSON as in this example: 
+`avsc` has a more flexible schema definition than most other libraries. Normally an Avro schema is defined in JSON as in this example: 
  
 ```typescript
 // Type for "float[][]"
@@ -410,14 +420,8 @@ const complexType = avsc.Type.forValue({
 });
 ```
  
-#### BSON
- 
-`bson` is slow at both encoding and decoding and bad at handling large paylods, but does not require a schema and is deserialized cleanly without added remnants.
- 
  
 #### JSBIN
- 
-`js-binary` is fast at both encoding and decoding, has a very good size ratio is good at handling large payloads and is deserialized cleanly without added remnants.
  
 Like `avsc` it also has a more succinct schema definition than most other implementations.
  
@@ -505,7 +509,9 @@ For some unexplained reason the encoded size ratio remained the same for both th
  
 ## Conclusion
 
-Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it on top. Performance was also slightly worse when processing small arrays compared to similar sized structs. As with many other measured libraries, some remnants of the deserialization process are left in the prototype of the decompiled data which could be a disadvantage in some cases.
+The libraries `js-binary`, `pbf`, `bser` and `bson` all convert cleanly back to JavaScript without any detected remnants from the encoding process. `avro-js` and `js-binary` contained minor remnants. `google-protobuf` and `protons` had major remnants or ramifications.
+
+Overall `avsc` performed very well in all measurements, was easy to setup and seems to be the overall best performing serialization library. Switching from mandatory to optional fields slightly worsened performance and compression ratio, but still puts it on top. Performance was also slightly worse when processing small arrays compared to similar sized structs.
  
 `js-binary` performed well in all measurements, was easy to setup and is deserialized cleanly. One disadvantage being that it uses a custom binary format that could make interoperability with other programming languages difficult. Switching from mandatory to optional fields had almost no impact on performance.
 
@@ -515,6 +521,9 @@ Regarding Protocol Buffer libraries it should be noted that all fields are optio
  
 `pbf` performed only slightly better than native JSON but is deserialized cleanly without any remnants.
  
+`bser` was slower than native JSON at both encoding and decoding (slightly slower than BSON). It was however very good at handling large payloads, and provides a good compression ratio considering it does not require a schema, and is deserialized cleanly.
+
 `bson` was slower than native JSON at both encoding and decoding, provided only a modest compression ratio, and was bad at handling large payloads, but does not require a schema and is deserialized cleanly.
  
 `google-protobuf` was slow at encoding, performs average during decoding but might require additional decoding that would further decrease performance, requires extra setup and can cause unexpected renaming of variables.
+
