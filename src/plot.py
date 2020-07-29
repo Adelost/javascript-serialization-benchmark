@@ -43,7 +43,6 @@ def main():
         "PROTOBUF Pbf",
         "PROTOBUF mixed",
 
-
     ]
     plot()
     #

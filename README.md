@@ -367,8 +367,8 @@ This is a ranking of the estimated maximum safe payload limit (measured as JSON)
 
 ### Negative effects during decoding
  
-| |BSON|JSBIN|AVRO|BSER|
-|---|---|---|---|---|---|---
+| |BSON|JSBIN|AVRO|BSER
+|---|---|---|---|---
 |Prototype pollution | | |x| 
  
 > This table shows an overview of negative effects during decoding.
