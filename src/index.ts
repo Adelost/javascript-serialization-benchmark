@@ -46,29 +46,29 @@ const TESTS = {
 })();
 
 async function runDefault() {
-  // console.log('Running default');
-  // await TESTS.testJson();
-  //
-  // await TESTS.testBson();
-  //
-  // await TESTS.testAvroJs();
-  // await TESTS.testAvroAvsc();
-  // await TESTS.testAvroAvscOptional();
-  //
-  // await TESTS.testProtoJs();
-  // await TESTS.testProtoPbf();
-  // await TESTS.testProtoGoogle();
-  // await TESTS.testProtoProtons();
-  // await TESTS.testProtoMixed();
-  //
-  // await TESTS.testJsBin();
-  // await TESTS.testJsBinOptional();
+  console.log('Running default');
+  await TESTS.testJson();
+
+  await TESTS.testBson();
+
+  await TESTS.testAvroJs();
+  await TESTS.testAvroAvsc();
+  await TESTS.testAvroAvscOptional();
+
+  await TESTS.testProtoJs();
+  await TESTS.testProtoPbf();
+  await TESTS.testProtoGoogle();
+  await TESTS.testProtoProtons();
+  await TESTS.testProtoMixed();
+
+  await TESTS.testJsBin();
+  await TESTS.testJsBinOptional();
 
   await TESTS.testBser();
-  //
-  // await TESTS.testJsonUnmapped();
-  // await TESTS.testAvroAvscUnmapped();
-  // await TESTS.testJsBinUnmapped();
-  // await TESTS.testJsBinJsonUnmapped();
-  // await TESTS.testBsonUnmapped();
+
+  await TESTS.testJsonUnmapped();
+  await TESTS.testAvroAvscUnmapped();
+  await TESTS.testJsBinUnmapped();
+  await TESTS.testJsBinJsonUnmapped();
+  await TESTS.testBsonUnmapped();
 }
