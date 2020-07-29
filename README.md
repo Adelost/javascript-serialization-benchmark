@@ -1,12 +1,19 @@
-# Binary serialization comparison in JavaScript
+# Binary serialization comparison in JavaScript (Protocol Buffer, Avro, BSON, etc.)
  
-This is a comparison and benchmark of various binary serialization formats used in JavaScript as of 2020-07-28.
+This is a comparison and benchmark of various binary serialization formats and libraries used in JavaScript as of 2020-07-28.
  
-I was myself trying to decide what binary serialization format I should use with regard to performance, compression size and ease of use in my personal projects, and before I knew it I had spent the last few days doing a rather extensive comparison.
+I was myself trying to decide what binary serialization format I should use with regard to performance, compression size and ease of use in my personal projects, and what started out as a simple project soon turned into a rather extensive comparison.
  
 By sharing my findings, I hope it can be of help (and save time) to someone in a similar situation and perhaps inspire some developers to try out binary serialization.
 
 ## TL;DR
+
+The following formats and libraries are compared in this article:
+
+* Protocol Buffer: `protobuf-js`, `pbf`, `protons`, `google-protobuf`
+* Avro: `avsc`
+* BSON: `bson`
+* JSBinary: `js-binary`
 
 Based on the current benchmark results in this article I would rank the top libraries in the following order:
 
@@ -21,7 +28,7 @@ Due to various reasons outlined in the article I would not currenly recommend th
 * `protons`
 * `google-protobuf`
 
-Feel free to skip to the [Abstract](#abstract) and [Conclusion](#conclusion) sections of the article to read the summarized motivation.
+Feel free to skip to the [Abstract](#abstract) and [Conclusion](#conclusion) sections of the article to read the summarized motivation. For performance graphs and detailed measurements skip to [Result (final)](#result-final).
 
 ## Table of content
 
@@ -38,7 +45,9 @@ Feel free to skip to the [Abstract](#abstract) and [Conclusion](#conclusion) sec
  
 ## Abstract
  
-The following JavaScript serialization libraries and versions are compared with regards to performance, compression size and ease of use against JavaScript's native JSON library:
+This article and benchmark attempts to answer what binary serialization library to use with regard to performance, compression size and ease of use.
+
+The following JavaScript serialization libraries and versions are compared against each other and JavaScript's native JSON library:
  
 * `protobufjs "6.10.1"` 
 * `bson "4.0.4"` 
@@ -54,7 +63,7 @@ During decoding, `avsc`, `protobufjs`, `js-binary` all performed similarly well 
  
 `avsc` and `js-binary` gave the best compression ratio of the encoded data at 0.32 compared to JSON, followed by `protobufjs`, `pbf`, `google-protobuf`, `protons` with a ratio of 0.42.
  
-`avsc` and `js-binary` was able to handle the largest file sizes at both encoding and decoding, with an estimate of 372 MB (measured as JSON) given the default Node.js-heap size. In general, the maximum file size coincided with the measured encoding/decoding-speed of each implementation.
+`avsc`, `pbf` and `js-binary` were able to handle the largest file sizes at both encoding and decoding, with an estimate of 372 MB (measured as JSON) given the default Node.js-heap size. In general, the maximum file size coincided with the measured encoding/decoding-speed of each implementation.
  
 `js-binary`, `pbf`, `bson` all convert cleanly back to JavaScript without any detected remnants from the encoding process. `avro-js` and `js-binary` contained minor remnants. `google-protobuf` and `protons` had major remnants or ramifications.
  
@@ -126,7 +135,7 @@ They are categorized as:
 * Protocol Buffer (`protobufjs`, `pbf`, `google-protobuf`, `protons`): `google-protobuf` is Google's official release, but `protobufjs` is by far more popular library. To further compare against `protobufjs`, a third library called `protons` is included.  
 * BSON (`bson`): BSON stands for Binary JSON and is popularized by its use in MongoDB. 
 * Avro (`avsc`, `avro-js`): `avsc` seems to be the most popular Avro library. `avro-js` appears to be an offical release by the Apache Foundation but this was excluded from the result section as it seems to be based on a older version on `avsc`, and both libraries yielded very similar benchmark results with a slight advantage to `avsc`.
-* JS-Binary (`js-binary`): `js-binary` is the most obscure library (judging by weekly downloads) and it also uses a custom binary format that could make interoperability with other programming languages difficult, but this could also make it a good choice due to it being designed with JavaScript in mind.
+* JSBinary (`js-binary`): `js-binary` is the most obscure library (judging by weekly downloads) and it also uses a custom binary format that could make interoperability with other programming languages difficult, but this could also make it a good choice due to it being designed with JavaScript in mind.
  
 ## Benchmark
  
