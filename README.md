@@ -18,7 +18,7 @@ The following formats and libraries are compared:
 * BSER: `bser`
 * JSBinary: `js-binary`
 
-Based on the current benchmark results in this article, the author would rank the top libraries in the following order compared to JSON (given as x times faster at values greater than 1.0, or slower at values below):
+Based on the current benchmark results in this article, the author would rank the top libraries in the following order (higher values are better, measurements are given as x times faster than JSON):
 
 1. `avsc`: 10x encoding, 3-10x decoding
 2. `js-binary`: 2x encoding, 2-8x decoding
@@ -35,13 +35,13 @@ Ranked by encoded size (compared to JSON) only:
 4. `bson`: 79%
 5. `JSON`: 100%
 
-Due to performance or various other reasons outlined in the article, the author would not currenly recommend the following libraries:
+Due to various reasons outlined in the article, the author would not currenly recommend the following libraries:
 
 * `protons`: 2x encoding, 0.05x decoding
 * `google-protobuf`: 0.3-0.5x encoding, 0.8x decoding
 
 
-Feel free to skip to the [Conclusion](#conclusion) sections of the article to read the summarized motivation. For performance graphs and detailed measurements skip to [Result (final)](#result-final).
+Feel free to skip to the [Conclusion](#conclusion) sections of the article to read the summarized motivation. For performance graphs and detailed measurements skip to [Result (final)](#result-final). To reproduce the measurements, skip to [Setup](#setup).
 
 
 ## Table of content
@@ -108,7 +108,7 @@ Feel free to inspect my implementations in `src/benchmarks.ts`, and let me know 
  
 ## Libraries
  
-The following libraries and versions are tested (sorted by weekly downloads):
+The following libraries and versions are tested (sorted by NPM weekly downloads):
 
 * `bser "6.10.1"` - 7,671k
 * `protobufjs "6.10.1"` - 3,449k
@@ -129,7 +129,7 @@ They are categorized as:
 * JSBinary: `js-binary`
 
 
-`bser` is a binary serialization library developed for Facebook's "Watchman" filewatcher and seems to be the most popular binary serialization library. It is however, mainly used for loca-IPC (inter process communication) as strings are represented as binary with no specific encoding.
+`bser` is a binary serialization library developed for Facebook's "Watchman" filewatcher and is the most downloaded binary serialization library. It is however, mainly used for loca-IPC (inter process communication) as strings are represented as binary with no specific encoding.
 
 `google-protobuf` is Google's official Protocol Buffer release, but `protobufjs` is by far the more popular library.
 
@@ -363,9 +363,7 @@ This is a ranking of the estimated maximum safe payload limit (measured as JSON)
 1. `avsc`, `jsbin`, `pbf`, `bser`, `Protobuf (mixed)`: 372 MB
 2. `JSON`: 298 MB
 3. `protobuf-js`: 153 MB
-4. `google-protobuf`: 98 MB
-5. `protons`: 40 MB
-6. `bson`: 21 MB
+4. `bson`: 21 MB
 
 ### Negative effects during decoding
  
