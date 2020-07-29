@@ -35,12 +35,14 @@ def main():
     OUTPUT_NAME='bench-full.svg'
     ALLOWED_LABELS = [
         "JSON",
-        "BSON",
-        "AVRO Avsc",
         "JSBIN",
+        "AVRO Avsc",
+        "BSER",
+        "BSON",
         "PROTOBUF JS",
         "PROTOBUF Pbf",
         "PROTOBUF mixed",
+
 
     ]
     plot()

@@ -21,6 +21,8 @@ const TESTS = {
   testJsBin: () => runTest('JSBIN', ({ data }) => bench.testJsBin(data), 372),
   testJsBinOptional: () => runTest('JSBIN (optional)', ({ data }) => bench.testJsBinOptional(data), 372),
 
+  testBser: () => runTest('BSER', ({ data }) => bench.testBser(data), 372),
+
   testJsonUnmapped: () => runTest('JSON (unmapped)', ({ unmappedData }) => bench.testJsonUnmapped(unmappedData), 298),
   testAvroAvscUnmapped: () => runTest('AVRO Avsc (unmapped)', ({ unmappedData }) => bench.testAvroAvscUnmapped(unmappedData), 237),
   testJsBinUnmapped: () => runTest('JSBIN (unmapped)', ({ unmappedData }) => bench.testJsBinUnmapped(unmappedData), 372),
@@ -44,27 +46,29 @@ const TESTS = {
 })();
 
 async function runDefault() {
-  console.log('Running default');
-  await TESTS.testJson();
+  // console.log('Running default');
+  // await TESTS.testJson();
+  //
+  // await TESTS.testBson();
+  //
+  // await TESTS.testAvroJs();
+  // await TESTS.testAvroAvsc();
+  // await TESTS.testAvroAvscOptional();
+  //
+  // await TESTS.testProtoJs();
+  // await TESTS.testProtoPbf();
+  // await TESTS.testProtoGoogle();
+  // await TESTS.testProtoProtons();
+  // await TESTS.testProtoMixed();
+  //
+  // await TESTS.testJsBin();
+  // await TESTS.testJsBinOptional();
 
-  await TESTS.testBson();
-
-  await TESTS.testAvroJs();
-  await TESTS.testAvroAvsc();
-  await TESTS.testAvroAvscOptional();
-
-  await TESTS.testProtoJs();
-  await TESTS.testProtoPbf();
-  await TESTS.testProtoGoogle();
-  await TESTS.testProtoProtons();
-  await TESTS.testProtoMixed();
-
-  await TESTS.testJsBin();
-  await TESTS.testJsBinOptional();
-
-  await TESTS.testJsonUnmapped();
-  await TESTS.testAvroAvscUnmapped();
-  await TESTS.testJsBinUnmapped();
-  await TESTS.testJsBinJsonUnmapped();
-  await TESTS.testBsonUnmapped();
+  await TESTS.testBser();
+  //
+  // await TESTS.testJsonUnmapped();
+  // await TESTS.testAvroAvscUnmapped();
+  // await TESTS.testJsBinUnmapped();
+  // await TESTS.testJsBinJsonUnmapped();
+  // await TESTS.testBsonUnmapped();
 }

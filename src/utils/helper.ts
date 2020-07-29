@@ -57,7 +57,7 @@ export async function runTest(label: string, fn: (payload) => Promise<BenchmarkR
     }
     if (sizeInMb >= MIN_SIZE_IN_MB) {
       log(`\n${i} DATA SIZE: ${sizeInMb}`);
-      results.push(await fn({ unmappedData, mappedData: data }));
+      results.push(await fn({ unmappedData, data }));
       xValues.push(sizeInMb);
     } else {
       log(`# ${i} DATA SIZE: ${sizeInMb}`);

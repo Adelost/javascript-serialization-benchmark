@@ -10,6 +10,7 @@ import { ROOT_DIR } from './_root';
 import ProtoGoogleSchema from './data/google-protobuf_pb';
 import ProtoPbfSchema from './data/pbf_pb';
 import { benchmark, BenchmarkResult } from './utils/helper';
+import bser from 'bser';
 
 export function testJson(testData: any): Promise<BenchmarkResult> {
   return benchmark({
@@ -269,5 +270,14 @@ export function testBsonUnmapped(testData: any): Promise<BenchmarkResult> {
     encode: data => BSON.serialize(data),
     decode: data => BSON.deserialize(data),
     sampleDecoded: data => data[0],
+  });
+}
+
+export function testBser(testData: any): Promise<BenchmarkResult> {
+  return benchmark({
+    data: testData,
+    encode: data => bser.dumpToBuffer(data),
+    decode: data => bser.loadFromBuffer(data),
+    sampleDecoded: data => data.items[0],
   });
 }
