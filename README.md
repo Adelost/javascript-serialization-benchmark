@@ -71,7 +71,7 @@ This article will mostly focus on the performance aspect and provide a brief ove
  
 To reproduce the benchmark results, follow these steps.
  
-* Install Node.js ( `12.18.3 LTS` is recommended). 
+* Install Node.js ( `14 LTS` is requirement). 
 * Install dependencies:
  
 ```shell script
@@ -196,7 +196,7 @@ This is investigated in an additional result section that is found after the mai
  
 ### Hardware
  
-The benchmark is done in Node.js v12.16.3 on 64-bit Windows 10, with an Intel i7-4790K 4.00GHz CPU and 16 GB RAM.
+The benchmark is done in Node.js v12.16.3 on 64-bit Windows 10, with an Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz and 32 GB RAM(Speed: 2667 MT/s).
  
 ## Result (Protocol Buffers)
  
