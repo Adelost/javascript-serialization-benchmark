@@ -241,7 +241,7 @@ All implementations (`protobuf-js`, `pbf`, `protons`, `google-protobuf`) stayed 
 This is a ranking of the estimated maximum safe payload limit (measured as JSON) each library was able to process:
 
 1. `pbf`, `mixed`: 372 MB
-2. `JSON`: 298 MB
+2. `JSON`, `V8`, `MsgPack`: 298 MB
 3. `protobuf-js`: 153 MB
 4. `google-protobuf`: 98 MB
 5. `protons`: 40 MB
@@ -250,7 +250,7 @@ This is a ranking of the estimated maximum safe payload limit (measured as JSON)
 
 ### Negative effects during decoding
  
-| |JSON|JS|Google|Protons|Pbf|mixed
+| |JSON, V8, MsgPack|JS|Google|Protons|Pbf|mixed
 |---|---|---|---|---|---|---
 |Prototype pollution      | |x| |x| |x
 |Getters/Setters| | | |x| | | 
