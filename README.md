@@ -71,7 +71,7 @@ This article will mostly focus on the performance aspect and provide a brief ove
  
 To reproduce the benchmark results, follow these steps.
  
-* Install Node.js ( `12.18.3 LTS` is recommended). 
+* Install Node.js ( `14 LTS` is requirement). 
 * Install dependencies:
  
 ```shell script
@@ -196,7 +196,7 @@ This is investigated in an additional result section that is found after the mai
  
 ### Hardware
  
-The benchmark is done in Node.js v12.16.3 on 64-bit Windows 10, with an Intel i7-4790K 4.00GHz CPU and 16 GB RAM.
+The benchmark is done in Node.js v12.16.3 on 64-bit Windows 10, with an Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz and 32 GB RAM(Speed: 2667 MT/s).
  
 ## Result (Protocol Buffers)
  
@@ -241,7 +241,7 @@ All implementations (`protobuf-js`, `pbf`, `protons`, `google-protobuf`) stayed 
 This is a ranking of the estimated maximum safe payload limit (measured as JSON) each library was able to process:
 
 1. `pbf`, `mixed`: 372 MB
-2. `JSON`: 298 MB
+2. `JSON`, `V8`, `MsgPack`: 298 MB
 3. `protobuf-js`: 153 MB
 4. `google-protobuf`: 98 MB
 5. `protons`: 40 MB
@@ -250,7 +250,7 @@ This is a ranking of the estimated maximum safe payload limit (measured as JSON)
 
 ### Negative effects during decoding
  
-| |JSON|JS|Google|Protons|Pbf|mixed
+| |JSON, V8, MsgPack|JS|Google|Protons|Pbf|mixed
 |---|---|---|---|---|---|---
 |Prototype pollution      | |x| |x| |x
 |Getters/Setters| | | |x| | | 

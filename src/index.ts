@@ -4,6 +4,8 @@ import { runTest } from './utils/helper';
 
 const TESTS = {
   testJson: () => runTest('JSON', ({ data }) => bench.testJson(data), 298),
+  testV8: () => runTest('V8', ({ data }) => bench.testV8(data), 298),
+  testMsgPack: () => runTest('MsgPack', ({ data }) => bench.testMsgPack(data), 298),
 
   testBson: () => runTest('BSON', ({ data }) => bench.testBson(data), 21),
 
@@ -48,6 +50,8 @@ const TESTS = {
 async function runDefault() {
   console.log('Running default');
   await TESTS.testJson();
+  await TESTS.testV8();
+  await TESTS.testMsgPack();
 
   await TESTS.testBson();
 

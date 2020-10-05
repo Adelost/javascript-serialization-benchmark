@@ -2,6 +2,10 @@
 
 npm start 'testJson'
 
+npm start 'testMsgPack'
+
+npm start 'testV8'
+
 npm start 'testBson'
 
 npm start 'testAvroJs'
