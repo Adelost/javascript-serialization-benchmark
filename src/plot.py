@@ -36,6 +36,7 @@ def main():
     ALLOWED_LABELS = [
         "JSON",
         "JSBIN",
+        "V8 Serialize",
         "AVRO Avsc",
         "BSER",
         "BSON",

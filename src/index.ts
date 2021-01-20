@@ -1,16 +1,16 @@
 import * as bench from './benchmarks';
 import { runTest } from './utils/helper';
 
-
 const TESTS = {
   testJson: () => runTest('JSON', ({ data }) => bench.testJson(data), 298),
+
+  testV8Serialize: () => runTest('V8 Serialize', ({ data }) => bench.testV8Serialize(data), 298),
 
   testBson: () => runTest('BSON', ({ data }) => bench.testBson(data), 21),
 
   testAvroJs: () => runTest('AVRO JS', ({ data }) => bench.testAvroJs(data), 372),
   testAvroAvsc: () => runTest('AVRO Avsc', ({ data }) => bench.testAvroAvsc(data), 372),
   testAvroAvscOptional: () => runTest('AVRO Avsc (optional)', ({ data }) => bench.testAvroAvscOptional(data), 372),
-
 
   testProtoJs: () => runTest('PROTOBUF JS', ({ data }) => bench.testProtoJs(data), 153),
   testProtoPbf: () => runTest('PROTOBUF Pbf', ({ data }) => bench.testProtoPbf(data), 372),
