@@ -2,6 +2,8 @@
 
 npm start 'testJson'
 
+npm start 'testV8Serialize'
+
 npm start 'testBson'
 
 npm start 'testAvroJs'

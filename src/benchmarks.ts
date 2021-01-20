@@ -25,10 +25,20 @@ export function testJson(testData: any): Promise<BenchmarkResult> {
 export function testJsonUnmapped(testData: any): Promise<BenchmarkResult> {
   return benchmark({
     data: testData,
-    encode: data => JSON.stringify(data),
-    decode: data => JSON.parse(data),
-    sampleDecoded: data => data[0],
+    encode: (data) => JSON.stringify(data),
+    decode: (data) => JSON.parse(data),
+    sampleDecoded: (data) => data[0],
     encoding: 'utf8',
+  });
+}
+
+export function testV8Serialize(testData: any): Promise<BenchmarkResult> {
+  const v8 = require('v8');
+  return benchmark({
+    data: testData,
+    encode: (data) => v8.serialize(data),
+    decode: (data) => v8.deserialize(data),
+    sampleDecoded: (data) => data.items[0],
   });
 }
 
